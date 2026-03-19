@@ -88,27 +88,27 @@ begin
   on conflict (provider_id, provider) do nothing;
 
   insert into public.user_preferences (user_id, default_currency, locale, session_max_hours)
-  values (admin_user_id, 'USD', 'en-US', 4)
+  values (admin_user_id, 'BRL', 'pt-BR', 4)
   on conflict (user_id) do nothing;
 
   insert into public.accounts (user_id, name, type, currency, initial_balance)
-  values (admin_user_id, 'Main Account', 'checking', 'USD', 0)
+  values (admin_user_id, 'Conta principal', 'checking', 'BRL', 0)
   on conflict (user_id, normalized_name) do nothing;
 
   insert into public.categories (user_id, name, kind, color, icon, is_system)
   values
-    (admin_user_id, 'Salary', 'income', '#884545', 'LuBriefcaseBusiness', true),
+    (admin_user_id, 'Salário', 'income', '#884545', 'LuBriefcaseBusiness', true),
     (admin_user_id, 'Freelance', 'income', '#a65454', 'LuLaptop', true),
-    (admin_user_id, 'Investments', 'income', '#7b3a3a', 'LuTrendingUp', true),
-    (admin_user_id, 'Other Income', 'income', '#b06767', 'LuPlus', true),
-    (admin_user_id, 'Housing', 'expense', '#8a2d2d', 'LuHouse', true),
-    (admin_user_id, 'Food', 'expense', '#994040', 'LuUtensilsCrossed', true),
-    (admin_user_id, 'Transport', 'expense', '#b25050', 'LuBus', true),
-    (admin_user_id, 'Health', 'expense', '#aa4a4a', 'LuHeartPulse', true),
-    (admin_user_id, 'Education', 'expense', '#7f3f3f', 'LuBookOpen', true),
-    (admin_user_id, 'Leisure', 'expense', '#b45e5e', 'LuGamepad2', true),
-    (admin_user_id, 'Bills', 'expense', '#893737', 'LuReceiptText', true),
-    (admin_user_id, 'Other Expense', 'expense', '#bf7272', 'LuCircleEllipsis', true)
+    (admin_user_id, 'Investimentos', 'income', '#7b3a3a', 'LuTrendingUp', true),
+    (admin_user_id, 'Outras receitas', 'income', '#b06767', 'LuPlus', true),
+    (admin_user_id, 'Moradia', 'expense', '#8a2d2d', 'LuHouse', true),
+    (admin_user_id, 'Alimentação', 'expense', '#994040', 'LuUtensilsCrossed', true),
+    (admin_user_id, 'Transporte', 'expense', '#b25050', 'LuBus', true),
+    (admin_user_id, 'Saúde', 'expense', '#aa4a4a', 'LuHeartPulse', true),
+    (admin_user_id, 'Educação', 'expense', '#7f3f3f', 'LuBookOpen', true),
+    (admin_user_id, 'Lazer', 'expense', '#b45e5e', 'LuGamepad2', true),
+    (admin_user_id, 'Contas e boletos', 'expense', '#893737', 'LuReceiptText', true),
+    (admin_user_id, 'Outras despesas', 'expense', '#bf7272', 'LuCircleEllipsis', true)
   on conflict (user_id, normalized_name, kind) do nothing;
 
   insert into public.user_profiles (user_id, email, full_name, is_admin)

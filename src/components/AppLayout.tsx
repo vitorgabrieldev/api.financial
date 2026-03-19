@@ -57,7 +57,6 @@ export const AppLayout = ({
           </nav>
 
           <div className="space-y-3 border border-border bg-white/70 p-3 text-xs">
-            <p className="text-muted">Sessão: 4h</p>
             <p className="truncate text-ink">{userName}</p>
             <p className="truncate text-ink">{userEmail}</p>
             <button

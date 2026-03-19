@@ -77,27 +77,27 @@ set search_path = public
 as $$
 begin
   insert into public.user_preferences (user_id, default_currency, locale, session_max_hours)
-  values (new.id, 'USD', 'en-US', 4)
+  values (new.id, 'BRL', 'pt-BR', 4)
   on conflict (user_id) do nothing;
 
   insert into public.accounts (user_id, name, type, currency, initial_balance)
-  values (new.id, 'Main Account', 'checking', 'USD', 0)
+  values (new.id, 'Conta principal', 'checking', 'BRL', 0)
   on conflict (user_id, normalized_name) do nothing;
 
   insert into public.categories (user_id, name, kind, color, icon, is_system)
   values
-    (new.id, 'Salary', 'income', '#884545', 'LuBriefcaseBusiness', true),
+    (new.id, 'Salário', 'income', '#884545', 'LuBriefcaseBusiness', true),
     (new.id, 'Freelance', 'income', '#a65454', 'LuLaptop', true),
-    (new.id, 'Investments', 'income', '#7b3a3a', 'LuTrendingUp', true),
-    (new.id, 'Other Income', 'income', '#b06767', 'LuPlus', true),
-    (new.id, 'Housing', 'expense', '#8a2d2d', 'LuHouse', true),
-    (new.id, 'Food', 'expense', '#994040', 'LuUtensilsCrossed', true),
-    (new.id, 'Transport', 'expense', '#b25050', 'LuBus', true),
-    (new.id, 'Health', 'expense', '#aa4a4a', 'LuHeartPulse', true),
-    (new.id, 'Education', 'expense', '#7f3f3f', 'LuBookOpen', true),
-    (new.id, 'Leisure', 'expense', '#b45e5e', 'LuGamepad2', true),
-    (new.id, 'Bills', 'expense', '#893737', 'LuReceiptText', true),
-    (new.id, 'Other Expense', 'expense', '#bf7272', 'LuCircleEllipsis', true)
+    (new.id, 'Investimentos', 'income', '#7b3a3a', 'LuTrendingUp', true),
+    (new.id, 'Outras receitas', 'income', '#b06767', 'LuPlus', true),
+    (new.id, 'Moradia', 'expense', '#8a2d2d', 'LuHouse', true),
+    (new.id, 'Alimentação', 'expense', '#994040', 'LuUtensilsCrossed', true),
+    (new.id, 'Transporte', 'expense', '#b25050', 'LuBus', true),
+    (new.id, 'Saúde', 'expense', '#aa4a4a', 'LuHeartPulse', true),
+    (new.id, 'Educação', 'expense', '#7f3f3f', 'LuBookOpen', true),
+    (new.id, 'Lazer', 'expense', '#b45e5e', 'LuGamepad2', true),
+    (new.id, 'Contas e boletos', 'expense', '#893737', 'LuReceiptText', true),
+    (new.id, 'Outras despesas', 'expense', '#bf7272', 'LuCircleEllipsis', true)
   on conflict (user_id, normalized_name, kind) do nothing;
 
   insert into public.user_profiles (user_id, email, full_name, is_admin)

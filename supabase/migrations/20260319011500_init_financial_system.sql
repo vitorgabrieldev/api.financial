@@ -52,8 +52,8 @@ $$;
 
 create table if not exists public.user_preferences (
   user_id uuid primary key references auth.users(id) on delete cascade,
-  default_currency char(3) not null default 'USD',
-  locale text not null default 'en-US',
+  default_currency char(3) not null default 'BRL',
+  locale text not null default 'pt-BR',
   session_max_hours integer not null default 4 check (session_max_hours between 1 and 24),
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now()),
@@ -66,7 +66,7 @@ create table if not exists public.accounts (
   name text not null check (length(trim(name)) >= 2),
   normalized_name text generated always as (lower(trim(name))) stored,
   type public.account_type not null default 'checking',
-  currency char(3) not null default 'USD',
+  currency char(3) not null default 'BRL',
   initial_balance numeric(14,2) not null default 0,
   is_archived boolean not null default false,
   created_at timestamptz not null default timezone('utc', now()),
@@ -98,7 +98,7 @@ create table if not exists public.goals (
   normalized_name text generated always as (lower(trim(name))) stored,
   target_amount numeric(14,2) not null check (target_amount > 0),
   current_amount numeric(14,2) not null default 0 check (current_amount >= 0),
-  currency char(3) not null default 'USD',
+  currency char(3) not null default 'BRL',
   target_date date,
   status public.goal_status not null default 'active',
   notes text,
@@ -120,9 +120,9 @@ create table if not exists public.transactions (
   description text not null check (length(trim(description)) >= 2),
   notes text,
   amount numeric(14,2) not null check (amount > 0),
-  currency char(3) not null default 'USD',
+  currency char(3) not null default 'BRL',
   amount_in_default_currency numeric(14,2) not null check (amount_in_default_currency >= 0),
-  default_currency char(3) not null default 'USD',
+  default_currency char(3) not null default 'BRL',
   exchange_rate numeric(18,8) not null default 1 check (exchange_rate > 0),
   occurs_on date not null default current_date,
   attachment_path text,
@@ -193,27 +193,27 @@ set search_path = public
 as $$
 begin
   insert into public.user_preferences (user_id, default_currency, locale, session_max_hours)
-  values (new.id, 'USD', 'en-US', 4)
+  values (new.id, 'BRL', 'pt-BR', 4)
   on conflict (user_id) do nothing;
 
   insert into public.accounts (user_id, name, type, currency, initial_balance)
-  values (new.id, 'Main Account', 'checking', 'USD', 0)
+  values (new.id, 'Conta principal', 'checking', 'BRL', 0)
   on conflict (user_id, normalized_name) do nothing;
 
   insert into public.categories (user_id, name, kind, color, icon, is_system)
   values
-    (new.id, 'Salary', 'income', '#884545', 'LuBriefcaseBusiness', true),
+    (new.id, 'Salário', 'income', '#884545', 'LuBriefcaseBusiness', true),
     (new.id, 'Freelance', 'income', '#a65454', 'LuLaptop', true),
-    (new.id, 'Investments', 'income', '#7b3a3a', 'LuTrendingUp', true),
-    (new.id, 'Other Income', 'income', '#b06767', 'LuPlus', true),
-    (new.id, 'Housing', 'expense', '#8a2d2d', 'LuHouse', true),
-    (new.id, 'Food', 'expense', '#994040', 'LuUtensilsCrossed', true),
-    (new.id, 'Transport', 'expense', '#b25050', 'LuBus', true),
-    (new.id, 'Health', 'expense', '#aa4a4a', 'LuHeartPulse', true),
-    (new.id, 'Education', 'expense', '#7f3f3f', 'LuBookOpen', true),
-    (new.id, 'Leisure', 'expense', '#b45e5e', 'LuGamepad2', true),
-    (new.id, 'Bills', 'expense', '#893737', 'LuReceiptText', true),
-    (new.id, 'Other Expense', 'expense', '#bf7272', 'LuCircleEllipsis', true)
+    (new.id, 'Investimentos', 'income', '#7b3a3a', 'LuTrendingUp', true),
+    (new.id, 'Outras receitas', 'income', '#b06767', 'LuPlus', true),
+    (new.id, 'Moradia', 'expense', '#8a2d2d', 'LuHouse', true),
+    (new.id, 'Alimentação', 'expense', '#994040', 'LuUtensilsCrossed', true),
+    (new.id, 'Transporte', 'expense', '#b25050', 'LuBus', true),
+    (new.id, 'Saúde', 'expense', '#aa4a4a', 'LuHeartPulse', true),
+    (new.id, 'Educação', 'expense', '#7f3f3f', 'LuBookOpen', true),
+    (new.id, 'Lazer', 'expense', '#b45e5e', 'LuGamepad2', true),
+    (new.id, 'Contas e boletos', 'expense', '#893737', 'LuReceiptText', true),
+    (new.id, 'Outras despesas', 'expense', '#bf7272', 'LuCircleEllipsis', true)
   on conflict (user_id, normalized_name, kind) do nothing;
 
   return new;

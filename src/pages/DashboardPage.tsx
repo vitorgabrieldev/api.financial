@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { LuScale, LuTrendingDown, LuTrendingUp } from 'react-icons/lu'
+import { AccountIdentity } from '../components/AccountIdentity'
 import { Panel } from '../components/Panel'
 import { PageSkeleton } from '../components/PageSkeleton'
 import { fetchAccounts, fetchGoals, fetchTransactions } from '../lib/db'
 import { formatCurrency, formatShortDate } from '../lib/format'
+import { getTransactionTypeLabel } from '../lib/labels'
 import type {
   Account,
   Goal,
@@ -150,7 +152,7 @@ export const DashboardPage = ({ userId, preferences }: DashboardPageProps) => {
     <div className="grid gap-4">
       <section className="grid gap-3 md:grid-cols-3">
         <MetricCard
-          label="Entradas do mês"
+          label="Receitas do mês"
           value={formatCurrency(
             monthTotals.income,
             preferences.default_currency,
@@ -159,7 +161,7 @@ export const DashboardPage = ({ userId, preferences }: DashboardPageProps) => {
           icon={<LuTrendingUp className="h-4 w-4" />}
         />
         <MetricCard
-          label="Saídas do mês"
+          label="Despesas do mês"
           value={formatCurrency(
             monthTotals.expense,
             preferences.default_currency,
@@ -186,7 +188,7 @@ export const DashboardPage = ({ userId, preferences }: DashboardPageProps) => {
                 key={account.id}
                 className="grid grid-cols-[1fr_auto] items-center border border-border bg-white/70 px-3 py-2 text-sm"
               >
-                <span>{account.name}</span>
+                <AccountIdentity account={account} compact />
                 <strong className="font-medium text-ink">
                   {formatCurrency(
                     accountBalances[account.id] ?? 0,
@@ -261,7 +263,9 @@ export const DashboardPage = ({ userId, preferences }: DashboardPageProps) => {
                     {formatShortDate(item.occurs_on, preferences.locale)}
                   </td>
                   <td className="py-3 pr-2 text-ink">{item.description}</td>
-                  <td className="py-3 pr-2 capitalize text-muted">{item.type}</td>
+                  <td className="py-3 pr-2 text-muted">
+                    {getTransactionTypeLabel(item.type)}
+                  </td>
                   <td className="py-3 text-right font-medium text-ink">
                     {formatCurrency(item.amount, item.currency, preferences.locale)}
                   </td>

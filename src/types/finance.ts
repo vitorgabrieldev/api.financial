@@ -62,6 +62,8 @@ export interface Account {
   type: AccountType
   currency: string
   initial_balance: number
+  logo_path: string | null
+  logo_url: string | null
   is_archived: boolean
   created_at: string
 }

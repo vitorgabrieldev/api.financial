@@ -9,7 +9,10 @@ Aplicação web de organização financeira pessoal com:
 - Módulos: Dashboard, Transações, Categorias, Contas, Metas, Relatórios e Usuários
 - Controle de acesso por módulo e ação: visualizar, listar, criar, editar e excluir
 - Conversão de moedas por API externa (Frankfurter)
+- Moedas suportadas na UI: BRL, USD, EUR e JPY
 - Campos customizados de formulário (checkbox, select, data e upload)
+- Seletor visual de ícones para categorias
+- Upload de logo por conta (logo do banco)
 - Máscaras para telefone e valores monetários
 
 ## Stack
@@ -55,6 +58,7 @@ Migrations:
 - `supabase/migrations/20260319011500_init_financial_system.sql`
 - `supabase/migrations/20260319040000_access_control_users.sql`
 - `supabase/migrations/20260319053000_user_phone_access_update.sql`
+- `supabase/migrations/20260319070000_account_logos_ptbr_defaults.sql`
 
 Seed:
 
@@ -65,6 +69,7 @@ Seed:
 - Tabelas: `user_preferences`, `accounts`, `categories`, `goals`, `transactions`, `user_profiles`, `user_module_permissions`
 - Views: `monthly_report`, `category_report`
 - Bucket privado: `receipts` com policies por usuário
+- Bucket público: `account-logos` para exibição de logos das contas
 - RLS nas tabelas de domínio e de acesso
 - Funções RPC administrativas:
   - `admin_create_user`

@@ -49,14 +49,14 @@ export const getExchangeRate = async (
   )
 
   if (!response.ok) {
-    throw new Error('Falha ao buscar taxa de cambio.')
+    throw new Error('Falha ao buscar taxa de câmbio.')
   }
 
   const payload = (await response.json()) as { rates?: Record<string, number> }
   const rate = payload.rates?.[target]
 
   if (!rate || Number.isNaN(rate)) {
-    throw new Error('Taxa de cambio indisponivel para a moeda selecionada.')
+    throw new Error('Taxa de câmbio indisponível para a moeda selecionada.')
   }
 
   cache[key] = { rate, fetchedAt: Date.now() }

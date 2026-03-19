@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
-import { LuSave, LuTrash2, LuUserPlus } from 'react-icons/lu'
+import { LuPencilLine, LuSave, LuTrash2, LuUserPlus } from 'react-icons/lu'
 import { AccessDenied } from '../components/AccessDenied'
+import { AppModal } from '../components/AppModal'
 import { PageSkeleton } from '../components/PageSkeleton'
 import { Panel } from '../components/Panel'
 import { CustomCheckbox } from '../components/fields/CustomCheckbox'
@@ -156,6 +157,9 @@ export const UsersPage = ({ currentUserId, moduleAccess }: UsersPageProps) => {
   const [newPermissions, setNewPermissions] = useState<PermissionDraft[]>(
     makeDefaultPermissionDrafts(),
   )
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editingUserId, setEditingUserId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     if (!moduleAccess.can_list) {
@@ -288,6 +292,7 @@ export const UsersPage = ({ currentUserId, moduleAccess }: UsersPageProps) => {
       setNewPhone('')
       setNewIsAdmin(false)
       setNewPermissions(makeDefaultPermissionDrafts())
+      setIsCreateModalOpen(false)
       setMessage('Usuário criado com sucesso.')
       await load()
     } catch (createError) {
@@ -304,11 +309,11 @@ export const UsersPage = ({ currentUserId, moduleAccess }: UsersPageProps) => {
   const handleSaveAccess = async (userId: string) => {
     if (!moduleAccess.can_edit) {
       setError('Seu perfil não possui permissão para editar acessos.')
-      return
+      return false
     }
 
     const draft = drafts[userId]
-    if (!draft) return
+    if (!draft) return false
 
     setSubmitting(true)
     setError('')
@@ -323,12 +328,14 @@ export const UsersPage = ({ currentUserId, moduleAccess }: UsersPageProps) => {
       })
       setMessage('Acessos atualizados com sucesso.')
       await load()
+      return true
     } catch (updateError) {
       setError(
         updateError instanceof Error
           ? updateError.message
           : 'Falha ao atualizar acessos.',
       )
+      return false
     } finally {
       setSubmitting(false)
     }
@@ -371,15 +378,143 @@ export const UsersPage = ({ currentUserId, moduleAccess }: UsersPageProps) => {
     [profiles],
   )
 
+  const startEdit = (userId: string) => {
+    setEditingUserId(userId)
+    setIsEditModalOpen(true)
+  }
+
+  const closeEdit = () => {
+    setIsEditModalOpen(false)
+    setEditingUserId(null)
+  }
+
+  const editingProfile =
+    editingUserId != null
+      ? sortedProfiles.find((profile) => profile.user_id === editingUserId) ?? null
+      : null
+
+  const editingDraft =
+    editingUserId != null && drafts[editingUserId] ? drafts[editingUserId] : null
+
   if (!moduleAccess.can_view) return <AccessDenied moduleLabel="Usuários" />
   if (loading) return <PageSkeleton cards={1} lines={5} withForm withTable />
 
   return (
     <div className="grid gap-4">
-      {moduleAccess.can_create ? (
+      {error ? (
+        <p className="border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
+          {error}
+        </p>
+      ) : null}
+      {message ? (
+        <p className="border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
+          {message}
+        </p>
+      ) : null}
+
+      {moduleAccess.can_list ? (
         <Panel
+          title="Usuários cadastrados"
+          subtitle="Edição de acessos por perfil"
+          actions={
+            moduleAccess.can_create ? (
+              <button
+                type="button"
+                onClick={() => setIsCreateModalOpen(true)}
+                className="inline-flex items-center gap-2 border border-primary bg-primary px-3 py-2 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-primary-dark"
+              >
+                <LuUserPlus className="h-3.5 w-3.5" />
+                Novo usuário
+              </button>
+            ) : null
+          }
+        >
+          <div className="grid gap-4">
+            {sortedProfiles.map((profile) => {
+              const draft = drafts[profile.user_id]
+              if (!draft) return null
+
+              return (
+                <article
+                  key={profile.user_id}
+                  className="grid gap-3 border border-border bg-white/80 p-3 lg:grid-cols-[1fr_auto]"
+                >
+                  <div className="grid gap-2 text-sm">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.1em] text-muted">
+                        Nome
+                      </p>
+                      <p className="font-medium text-ink">{draft.fullName}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.1em] text-muted">
+                      Email
+                    </p>
+                    <p className="break-all text-ink">{profile.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.1em] text-muted">
+                      Telefone
+                    </p>
+                    <p className="text-ink">{draft.phone || 'Não informado'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.1em] text-muted">
+                      Perfil
+                    </p>
+                    <p className="text-ink">
+                      {draft.isAdmin ? 'Administrador' : 'Usuário padrão'}
+                    </p>
+                  </div>
+                  {profile.user_id === currentUserId ? (
+                    <p className="text-xs text-muted">Este é o seu usuário atual.</p>
+                  ) : null}
+                  <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+                    {moduleAccess.can_edit ? (
+                      <button
+                        type="button"
+                        onClick={() => startEdit(profile.user_id)}
+                        disabled={submitting}
+                        className="inline-flex items-center gap-2 border border-primary bg-primary px-3 py-2 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-primary-dark disabled:opacity-60"
+                      >
+                        <LuPencilLine className="h-3.5 w-3.5" />
+                        Editar
+                      </button>
+                    ) : null}
+
+                    {moduleAccess.can_delete && profile.user_id !== currentUserId ? (
+                      <button
+                        type="button"
+                        onClick={() => void handleDeleteUser(profile.user_id)}
+                        disabled={submitting}
+                        className="inline-flex items-center gap-2 border border-rose-300 bg-white px-3 py-2 text-xs font-medium uppercase tracking-[0.14em] text-rose-700 transition hover:bg-rose-50 disabled:opacity-60"
+                      >
+                        <LuTrash2 className="h-3.5 w-3.5" />
+                        Excluir usuário
+                      </button>
+                    ) : null}
+                  </div>
+                </article>
+              )
+            })}
+
+            {sortedProfiles.length === 0 ? (
+              <p className="text-sm text-muted">Nenhum usuário encontrado.</p>
+            ) : null}
+          </div>
+        </Panel>
+      ) : (
+        <AccessDenied moduleLabel="Lista de usuários" />
+      )}
+
+      {moduleAccess.can_create ? (
+        <AppModal
+          open={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
           title="Novo usuário"
           subtitle="Cadastro com permissão por módulo e ação (pt-BR)"
+          maxWidthClassName="max-w-6xl"
         >
           <form onSubmit={handleCreateUser} className="grid gap-3">
             <div className="grid gap-3 lg:grid-cols-2">
@@ -447,160 +582,130 @@ export const UsersPage = ({ currentUserId, moduleAccess }: UsersPageProps) => {
               </button>
             </div>
           </form>
-        </Panel>
+        </AppModal>
       ) : null}
 
-      {error ? (
-        <p className="border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
-          {error}
-        </p>
-      ) : null}
-      {message ? (
-        <p className="border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
-          {message}
-        </p>
-      ) : null}
-
-      {moduleAccess.can_list ? (
-        <Panel title="Usuários cadastrados" subtitle="Edição de acessos por perfil">
-          <div className="grid gap-4">
-            {sortedProfiles.map((profile) => {
-              const draft = drafts[profile.user_id]
-              if (!draft) return null
-
-              return (
-                <article key={profile.user_id} className="border border-border bg-white/80 p-3">
-                  <div className="mb-3 grid gap-3 lg:grid-cols-2">
-                    <label className="grid gap-1 text-sm">
-                      <span className="text-muted">Nome completo</span>
-                      <input
-                        value={draft.fullName}
-                        onChange={(event) =>
-                          setDrafts((current) => ({
-                            ...current,
-                            [profile.user_id]: {
-                              ...current[profile.user_id],
-                              fullName: event.target.value,
-                            },
+      {moduleAccess.can_edit && editingProfile && editingDraft ? (
+        <AppModal
+          open={isEditModalOpen}
+          onClose={closeEdit}
+          title="Editar usuário"
+          subtitle="Atualize dados e permissões por módulo"
+          maxWidthClassName="max-w-6xl"
+        >
+          <form
+            onSubmit={async (event) => {
+              event.preventDefault()
+              const saved = await handleSaveAccess(editingProfile.user_id)
+              if (saved) closeEdit()
+            }}
+            className="grid gap-3"
+          >
+            <div className="grid gap-3 lg:grid-cols-2">
+              <label className="grid gap-1 text-sm">
+                <span className="text-muted">Nome completo</span>
+                <input
+                  value={editingDraft.fullName}
+                  onChange={(event) =>
+                    setDrafts((current) => ({
+                      ...current,
+                      [editingProfile.user_id]: {
+                        ...current[editingProfile.user_id],
+                        fullName: event.target.value,
+                      },
+                    }))
+                  }
+                  disabled={!moduleAccess.can_edit}
+                  className="input"
+                />
+              </label>
+              <label className="grid gap-1 text-sm">
+                <span className="text-muted">Telefone</span>
+                <input
+                  value={editingDraft.phone}
+                  onChange={(event) =>
+                    setDrafts((current) => ({
+                      ...current,
+                      [editingProfile.user_id]: {
+                        ...current[editingProfile.user_id],
+                        phone: maskPhoneBR(event.target.value),
+                      },
+                    }))
+                  }
+                  disabled={!moduleAccess.can_edit}
+                  placeholder="(11) 99999-9999"
+                  className="input"
+                />
+              </label>
+              <label className="grid gap-1 text-sm">
+                <span className="text-muted">Email</span>
+                <input
+                  value={editingProfile.email}
+                  disabled
+                  className="input bg-neutral-50 text-xs text-muted"
+                />
+              </label>
+              <div className="grid gap-1 text-sm">
+                <span className="text-muted">Perfil</span>
+                <CustomSelect
+                  value={editingDraft.isAdmin ? 'admin' : 'user'}
+                  disabled={!moduleAccess.can_edit}
+                  onChange={(event) =>
+                    setDrafts((current) => {
+                      const nextAdmin = event.target.value === 'admin'
+                      const nextPermissions = nextAdmin
+                        ? current[editingProfile.user_id].permissions.map((item) => ({
+                            ...item,
+                            can_view: true,
+                            can_list: true,
+                            can_create: true,
+                            can_edit: true,
+                            can_delete: true,
                           }))
-                        }
-                        disabled={!moduleAccess.can_edit}
-                        className="input"
-                      />
-                    </label>
-                    <label className="grid gap-1 text-sm">
-                      <span className="text-muted">Telefone</span>
-                      <input
-                        value={draft.phone}
-                        onChange={(event) =>
-                          setDrafts((current) => ({
-                            ...current,
-                            [profile.user_id]: {
-                              ...current[profile.user_id],
-                              phone: maskPhoneBR(event.target.value),
-                            },
-                          }))
-                        }
-                        disabled={!moduleAccess.can_edit}
-                        placeholder="(11) 99999-9999"
-                        className="input"
-                      />
-                    </label>
-                    <label className="grid gap-1 text-sm">
-                      <span className="text-muted">Email</span>
-                      <input
-                        value={profile.email}
-                        disabled
-                        className="input bg-neutral-50 text-xs text-muted"
-                      />
-                    </label>
-                    <div className="grid gap-1 text-sm">
-                      <span className="text-muted">Perfil</span>
-                      <CustomSelect
-                        value={draft.isAdmin ? 'admin' : 'user'}
-                        disabled={!moduleAccess.can_edit}
-                        onChange={(event) =>
-                          setDrafts((current) => {
-                            const nextAdmin = event.target.value === 'admin'
-                            const nextPermissions = nextAdmin
-                              ? current[profile.user_id].permissions.map((item) => ({
-                                  ...item,
-                                  can_view: true,
-                                  can_list: true,
-                                  can_create: true,
-                                  can_edit: true,
-                                  can_delete: true,
-                                }))
-                              : current[profile.user_id].permissions
+                        : current[editingProfile.user_id].permissions
 
-                            return {
-                              ...current,
-                              [profile.user_id]: {
-                                ...current[profile.user_id],
-                                isAdmin: nextAdmin,
-                                permissions: nextPermissions,
-                              },
-                            }
-                          })
-                        }
-                      >
-                        <option value="user">Usuário padrão</option>
-                        <option value="admin">Administrador</option>
-                      </CustomSelect>
-                    </div>
-                  </div>
+                      return {
+                        ...current,
+                        [editingProfile.user_id]: {
+                          ...current[editingProfile.user_id],
+                          isAdmin: nextAdmin,
+                          permissions: nextPermissions,
+                        },
+                      }
+                    })
+                  }
+                >
+                  <option value="user">Usuário padrão</option>
+                  <option value="admin">Administrador</option>
+                </CustomSelect>
+              </div>
+            </div>
 
-                  {profile.user_id === currentUserId ? (
-                    <p className="mb-3 text-xs text-muted">
-                      Este é o seu usuário atual.
-                    </p>
-                  ) : null}
-
-                  <PermissionMatrix
-                    permissions={draft.permissions}
-                    disabled={!moduleAccess.can_edit || draft.isAdmin}
-                    onToggle={(module, action, checked) =>
-                      updateDraftPermission(profile.user_id, module, action, checked)
-                    }
-                  />
-
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    {moduleAccess.can_edit ? (
-                      <button
-                        type="button"
-                        onClick={() => void handleSaveAccess(profile.user_id)}
-                        disabled={submitting}
-                        className="inline-flex items-center gap-2 border border-primary bg-primary px-3 py-2 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-primary-dark disabled:opacity-60"
-                      >
-                        <LuSave className="h-3.5 w-3.5" />
-                        Salvar acessos
-                      </button>
-                    ) : null}
-
-                    {moduleAccess.can_delete && profile.user_id !== currentUserId ? (
-                      <button
-                        type="button"
-                        onClick={() => void handleDeleteUser(profile.user_id)}
-                        disabled={submitting}
-                        className="inline-flex items-center gap-2 border border-rose-300 bg-white px-3 py-2 text-xs font-medium uppercase tracking-[0.14em] text-rose-700 transition hover:bg-rose-50 disabled:opacity-60"
-                      >
-                        <LuTrash2 className="h-3.5 w-3.5" />
-                        Excluir usuário
-                      </button>
-                    ) : null}
-                  </div>
-                </article>
-              )
-            })}
-
-            {sortedProfiles.length === 0 ? (
-              <p className="text-sm text-muted">Nenhum usuário encontrado.</p>
+            {editingProfile.user_id === currentUserId ? (
+              <p className="text-xs text-muted">Este é o seu usuário atual.</p>
             ) : null}
-          </div>
-        </Panel>
-      ) : (
-        <AccessDenied moduleLabel="Lista de usuários" />
-      )}
+
+            <PermissionMatrix
+              permissions={editingDraft.permissions}
+              disabled={!moduleAccess.can_edit || editingDraft.isAdmin}
+              onToggle={(module, action, checked) =>
+                updateDraftPermission(editingProfile.user_id, module, action, checked)
+              }
+            />
+
+            <div>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
+              >
+                <LuSave className="h-4 w-4" />
+                Salvar alterações
+              </button>
+            </div>
+          </form>
+        </AppModal>
+      ) : null}
     </div>
   )
 }

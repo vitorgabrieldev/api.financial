@@ -26,8 +26,8 @@ export const getOrCreatePreferences = async (
 
   const fallback = {
     user_id: userId,
-    default_currency: 'USD',
-    locale: 'en-US',
+    default_currency: 'BRL',
+    locale: 'pt-BR',
     session_max_hours: 4,
   }
 
@@ -52,7 +52,20 @@ export const fetchAccounts = async (userId: string): Promise<Account[]> => {
     .order('created_at', { ascending: true })
 
   if (error) throw new Error(error.message)
-  return (data ?? []) as Account[]
+
+  return ((data ?? []) as Partial<Account>[]).map((account) => {
+    const logoPath = account.logo_path ?? null
+    const logoUrl = logoPath
+      ? supabase.storage.from('account-logos').getPublicUrl(logoPath).data
+          .publicUrl
+      : null
+
+    return {
+      ...account,
+      logo_path: logoPath,
+      logo_url: logoUrl,
+    } as Account
+  })
 }
 
 export const fetchCategories = async (userId: string): Promise<Category[]> => {
