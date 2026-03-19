@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Organização Financeira Pessoal">
+  <defs>
+    <linearGradient id="page" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f8f4f4" />
+      <stop offset="1" stop-color="#ebdcdc" />
+    </linearGradient>
+    <linearGradient id="panel" x1="90" y1="90" x2="1110" y2="540" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f2e4e4" />
+      <stop offset="1" stop-color="#e2c9c9" />
+    </linearGradient>
+    <linearGradient id="line" x1="180" y1="416" x2="448" y2="215" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7a2626" />
+      <stop offset="1" stop-color="#bc5555" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#page)" />
+
+  <g opacity="0.32" stroke="#b47b7b" stroke-width="1">
+    <path d="M0 120H1200" />
+    <path d="M0 240H1200" />
+    <path d="M0 360H1200" />
+    <path d="M0 480H1200" />
+    <path d="M160 0V630" />
+    <path d="M320 0V630" />
+    <path d="M480 0V630" />
+    <path d="M640 0V630" />
+    <path d="M800 0V630" />
+    <path d="M960 0V630" />
+  </g>
+
+  <rect x="88" y="88" width="1024" height="454" fill="url(#panel)" stroke="#6f2323" stroke-width="8" />
+
+  <rect x="140" y="156" width="336" height="336" fill="#f7eeee" stroke="#6f2323" stroke-width="12" />
+  <path d="M182 416L258 355L312 385L448 215" fill="none" stroke="url(#line)" stroke-width="24" stroke-linecap="square" stroke-linejoin="miter" />
+  <rect x="182" y="218" width="20" height="198" fill="#5e1d1d" />
+  <rect x="428" y="218" width="20" height="198" fill="#5e1d1d" />
+
+  <text x="534" y="246" fill="#451515" font-size="64" font-family="'IBM Plex Sans', 'Arial', sans-serif" font-weight="700">
+    Organização Financeira
+  </text>
+  <text x="534" y="312" fill="#5e2a2a" font-size="64" font-family="'IBM Plex Sans', 'Arial', sans-serif" font-weight="700">
+    Pessoal
+  </text>
+  <text x="534" y="374" fill="#6d3a3a" font-size="30" font-family="'IBM Plex Sans', 'Arial', sans-serif" font-weight="500">
+    Dashboard, transações, metas e relatórios em um só lugar.
+  </text>
+
+  <rect x="534" y="420" width="330" height="52" fill="#7a2a2a" />
+  <text x="560" y="455" fill="#f5e5e5" font-size="27" font-family="'IBM Plex Sans', 'Arial', sans-serif" font-weight="600">
+    Controle sério e objetivo
+  </text>
+</svg>
