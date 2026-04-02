@@ -1,0 +1,2124 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Financial Core API Docs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Manrope:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #ecf4f7;
+        --surface: #ffffff;
+        --surface-soft: #f5fafb;
+        --line: #d1dde6;
+        --line-strong: #a8bcc9;
+        --text: #0f1723;
+        --muted: #425767;
+        --brand: #0b7e78;
+        --brand-soft: #d5f5f1;
+        --danger: #b42318;
+        --warn: #b54708;
+        --ok: #067647;
+        --radius-sm: 8px;
+        --radius-md: 10px;
+        --radius-lg: 12px;
+        --shadow-sm: 0 10px 22px rgba(8, 20, 28, 0.07);
+        --shadow-md: 0 22px 36px rgba(8, 20, 28, 0.11);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        font-family: 'Manrope', 'Segoe UI', sans-serif;
+        background: radial-gradient(circle at 16% 6%, #e4f8f6 0%, #eaf3f7 42%, #e7eff4 100%);
+        color: var(--text);
+      }
+
+      body {
+        overflow: hidden;
+        position: relative;
+      }
+
+      body::before,
+      body::after {
+        content: '';
+        position: fixed;
+        z-index: -1;
+        border-radius: 12px;
+        filter: blur(2px);
+        opacity: 0.9;
+      }
+
+      body::before {
+        width: 360px;
+        height: 360px;
+        top: -100px;
+        right: -80px;
+        background: radial-gradient(circle at 30% 30%, #bff4ec, #dff4ff 70%);
+      }
+
+      body::after {
+        width: 420px;
+        height: 420px;
+        bottom: -200px;
+        left: -120px;
+        background: radial-gradient(circle at 40% 30%, #d4eefb, #dcf5e9 70%);
+      }
+
+      .app {
+        height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        opacity: 1;
+        transform: translateY(0);
+        transition: opacity 260ms ease, transform 280ms ease;
+      }
+
+      .app--locked {
+        opacity: 0;
+        transform: translateY(8px);
+        pointer-events: none;
+      }
+
+      .topbar {
+        display: grid;
+        gap: 14px;
+        padding: 16px 20px;
+        background: linear-gradient(130deg, rgba(255, 255, 255, 0.98), rgba(245, 251, 252, 0.96));
+        border-bottom: 1px solid var(--line);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .brand-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #0f766e, #1d9b92);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 10px 20px rgba(15, 118, 110, 0.26);
+      }
+
+      .title-wrap h1 {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.2;
+      }
+
+      .title-wrap p {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .toolbar-item {
+        min-width: 190px;
+      }
+
+      .toolbar-item label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      .toolbar-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .layout {
+        min-height: 0;
+        display: grid;
+        grid-template-columns: 320px minmax(480px, 1fr) 430px;
+        gap: 14px;
+        padding: 14px;
+      }
+
+      .panel {
+        background: linear-gradient(165deg, #ffffff, #f8fbfc 70%);
+        border: 1px solid #cfdae3;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .panel-header {
+        padding: 13px 14px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .panel-title {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .panel-subtitle {
+        margin: 2px 0 0;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .endpoint-search {
+        padding: 0 14px 12px;
+      }
+
+      .endpoint-search input {
+        width: 100%;
+      }
+
+      .endpoint-list {
+        overflow: auto;
+        padding: 0 10px 12px;
+      }
+
+      .tag-group {
+        margin: 8px 0 14px;
+      }
+
+      .tag-title {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        margin: 0 6px 8px;
+        text-transform: uppercase;
+      }
+
+      .endpoint-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        background: var(--surface-soft);
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 180ms ease;
+        animation: in-up 280ms ease both;
+      }
+
+      .endpoint-card:hover {
+        border-color: var(--line-strong);
+        transform: translateY(-1px);
+      }
+
+      .endpoint-card--active {
+        border-color: rgba(15, 118, 110, 0.5);
+        background: #edf8f6;
+        box-shadow: 0 8px 16px rgba(15, 118, 110, 0.08);
+      }
+
+      .method {
+        display: inline-flex;
+        min-width: 54px;
+        justify-content: center;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 8px;
+        margin-right: 8px;
+        color: #fff;
+      }
+
+      .method-get { background: #2563eb; }
+      .method-post { background: #0e9f6e; }
+      .method-patch { background: #f79009; }
+      .method-put { background: #0f8ac9; }
+      .method-delete { background: #d92d20; }
+
+      .endpoint-path {
+        font-family: 'JetBrains Mono', 'Fira Mono', monospace;
+        font-size: 12px;
+        color: #1e293b;
+        word-break: break-all;
+      }
+
+      .endpoint-summary {
+        margin: 7px 0 0;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .detail-content,
+      .response-content {
+        overflow: auto;
+        padding: 14px;
+      }
+
+      .detail-content.swap-out {
+        animation: detail-out 130ms ease forwards;
+      }
+
+      .detail-content.swap-in {
+        animation: detail-in 170ms ease both;
+      }
+
+      .operation-head {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        background: linear-gradient(145deg, #ffffff, #f8fbfc);
+        padding: 14px;
+        margin-bottom: 12px;
+        animation: in-fade 220ms ease;
+      }
+
+      .operation-title {
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .operation-title .operation-path {
+        font-family: 'JetBrains Mono', 'Fira Mono', monospace;
+        font-size: 13px;
+      }
+
+      .operation-description {
+        margin: 10px 0 0;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .security-badges {
+        margin-top: 10px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .badge {
+        border-radius: 8px;
+        padding: 5px 8px;
+        font-size: 11px;
+        font-weight: 700;
+        border: 1px solid transparent;
+      }
+
+      .badge--api-key {
+        background: #ecfdf3;
+        color: #067647;
+        border-color: #a6f4c5;
+      }
+
+      .badge--bearer {
+        background: #eff8ff;
+        color: #175cd3;
+        border-color: #b2ddff;
+      }
+
+      .section {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        background: var(--surface-soft);
+        margin-bottom: 12px;
+        overflow: hidden;
+      }
+
+      .section-head {
+        padding: 11px 12px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .section-title {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .section-body {
+        padding: 10px 12px 12px;
+      }
+
+      .helper-list {
+        margin: 0;
+        padding-left: 16px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .endpoint-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 8px;
+      }
+
+      .endpoint-meta-card {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: var(--radius-sm);
+        padding: 8px;
+      }
+
+      .endpoint-meta-card small {
+        display: block;
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+
+      .endpoint-meta-card strong {
+        font-size: 12px;
+        line-height: 1.3;
+      }
+
+      .param-grid {
+        display: grid;
+        gap: 10px;
+      }
+
+      .param-card {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: var(--radius-sm);
+        padding: 10px;
+      }
+
+      .param-top {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .param-name {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .param-in {
+        font-size: 11px;
+        color: var(--muted);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 2px 6px;
+      }
+
+      .required-dot {
+        font-size: 11px;
+        color: #d92d20;
+        font-weight: 700;
+      }
+
+      .param-description {
+        margin: 0 0 8px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .input-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .include-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .control,
+      .textarea,
+      .search-input {
+        border: 1px solid var(--line-strong);
+        background: #fff;
+        color: var(--text);
+        border-radius: var(--radius-sm);
+        padding: 9px 10px;
+        font-size: 13px;
+        width: 100%;
+      }
+
+      .control:focus,
+      .textarea:focus,
+      .search-input:focus {
+        outline: 2px solid rgba(15, 118, 110, 0.14);
+        border-color: #5db4ac;
+      }
+
+      .select-wrap {
+        position: relative;
+      }
+
+      .select-wrap::after {
+        content: '▾';
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: #6b7d8b;
+        font-size: 12px;
+      }
+
+      .control-select {
+        appearance: none;
+        padding-right: 28px;
+      }
+
+      .textarea {
+        min-height: 180px;
+        resize: vertical;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .btn {
+        border: 1px solid transparent;
+        border-radius: var(--radius-sm);
+        padding: 9px 13px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+      }
+
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      .btn-primary {
+        background: linear-gradient(130deg, #0f766e, #129387);
+        color: #fff;
+        box-shadow: 0 8px 18px rgba(15, 118, 110, 0.25);
+      }
+
+      .btn-primary:hover {
+        box-shadow: 0 11px 22px rgba(15, 118, 110, 0.28);
+      }
+
+      .btn-secondary {
+        border-color: var(--line-strong);
+        background: #fff;
+        color: var(--text);
+      }
+
+      .btn-danger {
+        border-color: rgba(185, 35, 24, 0.32);
+        background: #fff3f2;
+        color: var(--danger);
+      }
+
+      .exec-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .check {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        user-select: none;
+        cursor: pointer;
+      }
+
+      .check input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .check-box {
+        width: 18px;
+        height: 18px;
+        border-radius: 6px;
+        border: 1px solid var(--line-strong);
+        background: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 160ms ease;
+      }
+
+      .check-box::after {
+        content: '';
+        width: 9px;
+        height: 9px;
+        border-radius: 6px;
+        background: transparent;
+        transition: background 140ms ease;
+      }
+
+      .check input:checked + .check-box {
+        border-color: #0f766e;
+        background: #e5f7f4;
+      }
+
+      .check input:checked + .check-box::after {
+        background: #0f766e;
+      }
+
+      .switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--muted);
+        user-select: none;
+        cursor: pointer;
+      }
+
+      .switch input {
+        display: none;
+      }
+
+      .track {
+        width: 40px;
+        height: 22px;
+        border-radius: 11px;
+        background: #d6e0e6;
+        border: 1px solid #c2d0d8;
+        position: relative;
+        transition: background 170ms ease;
+      }
+
+      .track::after {
+        content: '';
+        width: 16px;
+        height: 16px;
+        border-radius: 8px;
+        background: #fff;
+        border: 1px solid #ccd7de;
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        transition: transform 170ms ease;
+      }
+
+      .switch input:checked + .track {
+        background: #0f766e;
+        border-color: #0f766e;
+      }
+
+      .switch input:checked + .track::after {
+        transform: translateX(18px);
+        border-color: #0f766e;
+      }
+
+      .response-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 8px;
+        padding: 4px 8px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .response-status--idle {
+        background: #eef2f6;
+        color: #3f5467;
+      }
+
+      .response-status--ok {
+        background: #ecfdf3;
+        color: var(--ok);
+      }
+
+      .response-status--warn {
+        background: #fff8eb;
+        color: var(--warn);
+      }
+
+      .response-status--error {
+        background: #fff3f2;
+        color: var(--danger);
+      }
+
+      .response-meta {
+        margin: 0 0 8px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .code-block {
+        margin: 0;
+        border: 1px solid var(--line);
+        background: #0f172a;
+        color: #d2e6ff;
+        border-radius: var(--radius-sm);
+        padding: 12px;
+        font-size: 12px;
+        line-height: 1.5;
+        overflow: auto;
+        min-height: 130px;
+        font-family: 'JetBrains Mono', monospace;
+        white-space: pre-wrap;
+      }
+
+      .code-block--schema {
+        background: #162134;
+      }
+
+      .response-doc-grid {
+        display: grid;
+        gap: 8px;
+      }
+
+      .response-doc {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: var(--radius-sm);
+        padding: 8px 10px;
+        width: 100%;
+        text-align: left;
+        font: inherit;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        cursor: pointer;
+        transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+      }
+
+      .response-doc:hover {
+        border-color: #7fbeb7;
+        transform: translateY(-1px);
+      }
+
+      .response-doc--active {
+        border-color: #56a8a0;
+        box-shadow: 0 8px 16px rgba(11, 126, 120, 0.14);
+        background: #eefaf8;
+      }
+
+      .response-doc-line {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .response-doc-code {
+        border-radius: var(--radius-sm);
+        padding: 4px 8px;
+        background: #edf4f9;
+        border: 1px solid #d6e5ef;
+        font-size: 11px;
+        font-weight: 800;
+        color: #1f3b53;
+      }
+
+      .response-doc-text {
+        color: var(--muted);
+        font-size: 12px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .code-block + .code-block {
+        margin-top: 10px;
+      }
+
+      .skeleton {
+        position: relative;
+        overflow: hidden;
+        background: #edf2f6;
+        border-radius: 8px;
+      }
+
+      .skeleton::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.62) 55%, transparent 100%);
+        animation: shimmer 1.15s infinite;
+      }
+
+      .skeleton-line {
+        height: 12px;
+        margin-bottom: 8px;
+      }
+
+      .skeleton-line:last-child {
+        margin-bottom: 0;
+      }
+
+      .skeleton-card {
+        border-radius: var(--radius-sm);
+        border: 1px solid #e2e9ef;
+        padding: 9px;
+        margin-bottom: 8px;
+        background: #fff;
+      }
+
+      .empty-state {
+        border: 1px dashed var(--line-strong);
+        background: #f9fcfd;
+        border-radius: var(--radius-md);
+        padding: 14px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(9, 15, 24, 0.66);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        z-index: 120;
+        animation: fade-in 180ms ease;
+      }
+
+      .modal-overlay.hidden {
+        display: none;
+      }
+
+      .modal {
+        width: min(560px, 100%);
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: linear-gradient(160deg, #fefefe 0%, #f8fcfb 100%);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        transform: translateY(0) scale(1);
+        animation: pop-in 240ms cubic-bezier(.22,.61,.36,1);
+      }
+
+      .modal.closing {
+        animation: pop-out 200ms ease forwards;
+      }
+
+      .modal-head {
+        border-bottom: 1px solid var(--line);
+        padding: 14px 16px;
+      }
+
+      .modal-head h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .modal-head p {
+        margin: 6px 0 0;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .modal-body {
+        padding: 14px 16px;
+      }
+
+      .field {
+        margin-bottom: 12px;
+      }
+
+      .field:last-child {
+        margin-bottom: 0;
+      }
+
+      .field label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .field small {
+        display: block;
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .modal-foot {
+        border-top: 1px solid var(--line);
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .modal-msg {
+        font-size: 12px;
+      }
+
+      .modal-msg.error {
+        color: var(--danger);
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      @keyframes shimmer {
+        100% { transform: translateX(100%); }
+      }
+
+      @keyframes in-up {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes in-fade {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes detail-out {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(4px); }
+      }
+
+      @keyframes detail-in {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes pop-in {
+        from { opacity: 0; transform: translateY(10px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+
+      @keyframes pop-out {
+        from { opacity: 1; transform: translateY(0) scale(1); }
+        to { opacity: 0; transform: translateY(8px) scale(0.98); }
+      }
+
+      @media (max-width: 1390px) {
+        .layout {
+          grid-template-columns: 280px minmax(420px, 1fr) 380px;
+        }
+      }
+
+      @media (max-width: 1120px) {
+        body {
+          overflow: auto;
+        }
+
+        .layout {
+          height: auto;
+          grid-template-columns: 1fr;
+        }
+
+        .panel {
+          min-height: 380px;
+        }
+
+        .response-panel {
+          min-height: 320px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="app app--locked">
+      <header class="topbar">
+        <div class="brand-row">
+          <div class="brand">
+            <div class="brand-mark">FC</div>
+            <div class="title-wrap">
+              <h1>Financial Core API Docs</h1>
+              <p>Navegador interativo com login Supabase para gerar JWT automaticamente.</p>
+            </div>
+          </div>
+          <div class="toolbar-actions">
+            <button id="open-credentials" class="btn btn-secondary" type="button">Credenciais</button>
+            <button id="clear-credentials" class="btn btn-danger" type="button">Resetar</button>
+          </div>
+        </div>
+        <div class="toolbar">
+          <div class="toolbar-item">
+            <label for="server-select">Servidor</label>
+            <div class="select-wrap">
+              <select id="server-select" class="control control-select"></select>
+            </div>
+          </div>
+          <div class="toolbar-item">
+            <label>&nbsp;</label>
+            <label class="check">
+              <input id="only-bearer" type="checkbox" />
+              <span class="check-box"></span>
+              <span>Somente rotas com Bearer</span>
+            </label>
+          </div>
+          <div class="toolbar-item">
+            <label>&nbsp;</label>
+            <label class="switch">
+              <input id="toggle-animations" type="checkbox" checked />
+              <span class="track"></span>
+              <span>Animações ativas</span>
+            </label>
+          </div>
+        </div>
+      </header>
+
+      <main class="layout">
+        <aside class="panel nav-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Endpoints</h2>
+              <p class="panel-subtitle" id="endpoint-count">Carregando...</p>
+            </div>
+          </div>
+          <div class="endpoint-search">
+            <input id="search-endpoint" class="search-input" placeholder="Filtrar endpoint, método, path..." />
+          </div>
+          <div id="endpoint-list" class="endpoint-list"></div>
+        </aside>
+
+        <section class="panel detail-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Como usar</h2>
+              <p class="panel-subtitle">Escolha um endpoint e monte a request</p>
+            </div>
+          </div>
+          <div id="detail-content" class="detail-content"></div>
+        </section>
+
+        <aside class="panel response-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Resultado</h2>
+              <p class="panel-subtitle">Prévia da request e retorno JSON</p>
+            </div>
+            <span id="response-status" class="response-status response-status--idle">Idle</span>
+          </div>
+          <div class="response-content">
+            <p id="response-meta" class="response-meta">Nenhuma requisição executada.</p>
+            <h3 class="panel-title" style="margin:0 0 8px; font-size:13px">Request</h3>
+            <pre id="request-preview" class="code-block">Selecione um endpoint para montar a request.</pre>
+            <h3 class="panel-title" style="margin:12px 0 8px; font-size:13px">Response</h3>
+            <pre id="response-preview" class="code-block">A resposta aparecerá aqui após executar.</pre>
+            <h3 class="panel-title" style="margin:12px 0 8px; font-size:13px">Exemplo OpenAPI</h3>
+            <pre id="schema-preview" class="code-block code-block--schema">O exemplo de resposta documentado aparecerá aqui.</pre>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <div id="credentials-modal" class="modal-overlay">
+      <div id="credentials-dialog" class="modal">
+        <div class="modal-head">
+          <h2>Conectar documentação</h2>
+          <p>
+            Informe API key + login do usuário. A docs faz autenticação e obtém o JWT automaticamente.
+          </p>
+        </div>
+        <div class="modal-body">
+          <div class="field">
+            <label for="modal-api-key">X-API-Key (obrigatória)</label>
+            <input id="modal-api-key" class="control" type="password" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="modal-email">Email do usuário</label>
+            <input id="modal-email" class="control" type="email" autocomplete="username" />
+            <small>
+              Esse usuário precisa existir no Supabase Auth e estar confirmado.
+            </small>
+          </div>
+          <div class="field">
+            <label for="modal-password">Senha</label>
+            <input id="modal-password" class="control" type="password" autocomplete="current-password" />
+            <small>
+              O token JWT (Bearer) será gerado via <code>/api/auth/login</code>.
+            </small>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <div id="modal-msg" class="modal-msg"></div>
+          <div style="display:flex; gap:8px;">
+            <button id="save-credentials" class="btn btn-primary" type="button">Salvar e abrir docs</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      ;(() => {
+        const STORAGE_API_KEY = 'mfo_docs_api_key'
+        const STORAGE_BEARER = 'mfo_docs_bearer_token'
+        const STORAGE_EMAIL = 'mfo_docs_login_email'
+
+        const state = {
+          spec: null,
+          operations: [],
+          selectedOperationId: null,
+          selectedResponseDocIndex: 0,
+          selectedServer: '/',
+          credentials: {
+            apiKey: '',
+            bearer: '',
+            email: '',
+          },
+          filters: {
+            search: '',
+            onlyBearer: false,
+            animations: true,
+          },
+        }
+
+        const appEl = document.getElementById('app')
+        const endpointCountEl = document.getElementById('endpoint-count')
+        const endpointListEl = document.getElementById('endpoint-list')
+        const detailContentEl = document.getElementById('detail-content')
+        const requestPreviewEl = document.getElementById('request-preview')
+        const responsePreviewEl = document.getElementById('response-preview')
+        const schemaPreviewEl = document.getElementById('schema-preview')
+        const responseMetaEl = document.getElementById('response-meta')
+        const responseStatusEl = document.getElementById('response-status')
+        const serverSelectEl = document.getElementById('server-select')
+        const searchEndpointEl = document.getElementById('search-endpoint')
+        const onlyBearerEl = document.getElementById('only-bearer')
+        const toggleAnimationsEl = document.getElementById('toggle-animations')
+
+        const openCredentialsBtn = document.getElementById('open-credentials')
+        const clearCredentialsBtn = document.getElementById('clear-credentials')
+
+        const modalOverlayEl = document.getElementById('credentials-modal')
+        const modalDialogEl = document.getElementById('credentials-dialog')
+        const modalApiKeyEl = document.getElementById('modal-api-key')
+        const modalEmailEl = document.getElementById('modal-email')
+        const modalPasswordEl = document.getElementById('modal-password')
+        const modalSaveEl = document.getElementById('save-credentials')
+        const modalMsgEl = document.getElementById('modal-msg')
+        let detailSwapTimer = null
+
+        const METHOD_ORDER = ['get', 'post', 'put', 'patch', 'delete']
+
+        const methodClass = (method) => `method method-${method}`
+
+        const sanitize = (value) =>
+          String(value)
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#39;')
+
+        const setResponseStatus = (label, type = 'idle') => {
+          responseStatusEl.className = `response-status response-status--${type}`
+          responseStatusEl.textContent = label
+        }
+
+        const setResponseMeta = (text) => {
+          responseMetaEl.textContent = text
+        }
+
+        const setModalMessage = (message, isError = false) => {
+          modalMsgEl.textContent = message
+          modalMsgEl.classList.toggle('error', isError)
+        }
+
+        const showLoadingSkeleton = () => {
+          endpointListEl.innerHTML = Array.from({ length: 10 })
+            .map(
+              () => `
+                <div class="skeleton-card">
+                  <div class="skeleton skeleton-line" style="width:50%"></div>
+                  <div class="skeleton skeleton-line" style="width:84%"></div>
+                  <div class="skeleton skeleton-line" style="width:62%"></div>
+                </div>
+              `,
+            )
+            .join('')
+
+          detailContentEl.innerHTML = `
+            <div class="skeleton-card" style="padding:12px; margin-bottom:10px;">
+              <div class="skeleton skeleton-line" style="width:42%"></div>
+              <div class="skeleton skeleton-line" style="width:94%"></div>
+              <div class="skeleton skeleton-line" style="width:74%"></div>
+            </div>
+            <div class="skeleton-card" style="padding:12px;">
+              <div class="skeleton skeleton-line" style="width:26%"></div>
+              <div class="skeleton skeleton-line" style="width:100%"></div>
+              <div class="skeleton skeleton-line" style="width:96%"></div>
+              <div class="skeleton skeleton-line" style="width:88%"></div>
+            </div>
+          `
+
+          requestPreviewEl.textContent = 'Carregando especificação...'
+          responsePreviewEl.textContent = 'Aguardando carregamento...'
+          schemaPreviewEl.textContent = 'Aguardando definição de endpoint...'
+          setResponseMeta('Nenhuma requisição executada.')
+          setResponseStatus('Loading', 'warn')
+        }
+
+        const lockDocs = () => {
+          appEl.classList.add('app--locked')
+        }
+
+        const unlockDocs = () => {
+          appEl.classList.remove('app--locked')
+        }
+
+        const openCredentialsModal = () => {
+          modalOverlayEl.classList.remove('hidden')
+          modalDialogEl.classList.remove('closing')
+          modalApiKeyEl.value = state.credentials.apiKey
+          modalEmailEl.value = state.credentials.email
+          modalPasswordEl.value = ''
+          setModalMessage('')
+        }
+
+        const closeCredentialsModal = () => {
+          modalDialogEl.classList.add('closing')
+          setTimeout(() => {
+            modalOverlayEl.classList.add('hidden')
+            modalDialogEl.classList.remove('closing')
+          }, 190)
+        }
+
+        const readStoredCredentials = () => {
+          state.credentials.apiKey = localStorage.getItem(STORAGE_API_KEY) || ''
+          state.credentials.bearer = localStorage.getItem(STORAGE_BEARER) || ''
+          state.credentials.email = localStorage.getItem(STORAGE_EMAIL) || ''
+        }
+
+        const persistCredentials = (apiKey, email, bearer) => {
+          localStorage.setItem(STORAGE_API_KEY, apiKey)
+          localStorage.setItem(STORAGE_EMAIL, email)
+          localStorage.setItem(STORAGE_BEARER, bearer)
+          state.credentials.apiKey = apiKey
+          state.credentials.email = email
+          state.credentials.bearer = bearer
+        }
+
+        const clearCredentials = () => {
+          localStorage.removeItem(STORAGE_API_KEY)
+          localStorage.removeItem(STORAGE_EMAIL)
+          localStorage.removeItem(STORAGE_BEARER)
+          state.credentials.apiKey = ''
+          state.credentials.email = ''
+          state.credentials.bearer = ''
+          lockDocs()
+          openCredentialsModal()
+          setModalMessage('Credenciais limpas. Informe novamente.', false)
+          state.spec = null
+          state.operations = []
+          state.selectedOperationId = null
+          showLoadingSkeleton()
+          endpointCountEl.textContent = 'Aguardando credenciais...'
+        }
+
+        const requestSpec = async () => {
+          const response = await fetch('/api/openapi.json', {
+            method: 'GET',
+            headers: {
+              'X-API-Key': state.credentials.apiKey,
+            },
+          })
+
+          if (!response.ok) {
+            const text = await response.text()
+            throw new Error(`Falha ao carregar OpenAPI (${response.status}). ${text}`)
+          }
+
+          return response.json()
+        }
+
+        const requestLoginToken = async ({ apiKey, email, password }) => {
+          const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+              'X-API-Key': apiKey,
+            },
+            body: JSON.stringify({ email, password }),
+          })
+
+          const payload = await response.json().catch(() => null)
+
+          if (!response.ok) {
+            const message = payload?.error || `Falha no login (${response.status}).`
+            throw new Error(message)
+          }
+
+          const token = payload?.data?.access_token
+          if (!token || typeof token !== 'string') {
+            throw new Error('Login executado, mas sem access_token na resposta.')
+          }
+
+          return token
+        }
+
+        const resolveRef = (ref) => {
+          if (!state.spec || !ref || typeof ref !== 'string' || !ref.startsWith('#/')) return null
+          return ref
+            .slice(2)
+            .split('/')
+            .reduce((acc, key) => (acc && key in acc ? acc[key] : null), state.spec)
+        }
+
+        const resolveSchema = (schema) => {
+          if (!schema) return null
+          if (schema.$ref) return resolveSchema(resolveRef(schema.$ref))
+          return schema
+        }
+
+        const schemaExample = (schema, depth = 0) => {
+          const resolved = resolveSchema(schema)
+          if (!resolved || depth > 4) return null
+
+          if (resolved.example !== undefined) return resolved.example
+          if (Array.isArray(resolved.enum) && resolved.enum.length > 0) return resolved.enum[0]
+
+          const type = resolved.type
+
+          if (type === 'object' || resolved.properties) {
+            const output = {}
+            const properties = resolved.properties || {}
+            const required = new Set(resolved.required || [])
+            for (const key of Object.keys(properties)) {
+              if (!required.has(key) && Object.keys(properties).length > 8) continue
+              const sample = schemaExample(properties[key], depth + 1)
+              if (sample !== undefined) output[key] = sample
+            }
+            return output
+          }
+
+          if (type === 'array') {
+            return [schemaExample(resolved.items, depth + 1)]
+          }
+
+          if (type === 'integer' || type === 'number') return 0
+          if (type === 'boolean') return false
+
+          if (resolved.format === 'date-time') return '2026-04-01T12:00:00Z'
+          if (resolved.format === 'date') return '2026-04-01'
+          if (resolved.format === 'uuid') return '11111111-1111-1111-1111-111111111111'
+
+          return ''
+        }
+
+        const flattenOperations = () => {
+          if (!state.spec?.paths) return []
+
+          const operations = []
+
+          for (const [path, pathItem] of Object.entries(state.spec.paths)) {
+            if (!pathItem || typeof pathItem !== 'object') continue
+
+            for (const method of METHOD_ORDER) {
+              const op = pathItem[method]
+              if (!op) continue
+
+              const inheritedParams = Array.isArray(pathItem.parameters)
+                ? pathItem.parameters
+                : []
+              const ownParams = Array.isArray(op.parameters) ? op.parameters : []
+              const combined = [...inheritedParams, ...ownParams]
+
+              const map = new Map()
+              for (const param of combined) {
+                const resolved = param?.$ref ? resolveRef(param.$ref) : param
+                if (!resolved?.name || !resolved?.in) continue
+                map.set(`${resolved.in}:${resolved.name}`, resolved)
+              }
+
+              const security = op.security ?? state.spec.security ?? []
+              const secEntries = Array.isArray(security) ? security : []
+              const requiresBearer = secEntries.some((entry) => entry && 'BearerAuth' in entry)
+              const requiresApiKey = secEntries.length === 0
+                ? true
+                : secEntries.some((entry) => entry && 'ApiKeyAuth' in entry)
+
+              operations.push({
+                id: `${method}:${path}`,
+                method,
+                path,
+                tag: Array.isArray(op.tags) && op.tags[0] ? op.tags[0] : 'General',
+                summary: op.summary || 'Sem resumo',
+                description: op.description || '',
+                parameters: [...map.values()],
+                requestBody: op.requestBody?.$ref
+                  ? resolveRef(op.requestBody.$ref)
+                  : op.requestBody,
+                responses: op.responses || {},
+                security,
+                requiresBearer,
+                requiresApiKey,
+              })
+            }
+          }
+
+          operations.sort((a, b) => {
+            if (a.tag !== b.tag) return a.tag.localeCompare(b.tag)
+            if (a.path !== b.path) return a.path.localeCompare(b.path)
+            return METHOD_ORDER.indexOf(a.method) - METHOD_ORDER.indexOf(b.method)
+          })
+
+          return operations
+        }
+
+        const filteredOperations = () => {
+          const search = state.filters.search.trim().toLowerCase()
+
+          return state.operations.filter((op) => {
+            if (state.filters.onlyBearer && !op.requiresBearer) return false
+
+            if (!search) return true
+
+            const haystack = `${op.method} ${op.path} ${op.summary} ${op.tag}`.toLowerCase()
+            return haystack.includes(search)
+          })
+        }
+
+        const renderEndpointList = () => {
+          const operations = filteredOperations()
+          endpointCountEl.textContent = `${operations.length} endpoint(s)`
+
+          if (operations.length === 0) {
+            endpointListEl.innerHTML = '<div class="empty-state">Nenhum endpoint encontrado com esse filtro.</div>'
+            return
+          }
+
+          const groups = operations.reduce((acc, op) => {
+            if (!acc[op.tag]) acc[op.tag] = []
+            acc[op.tag].push(op)
+            return acc
+          }, {})
+
+          let delay = 0
+          endpointListEl.innerHTML = Object.entries(groups)
+            .map(([tag, items]) => {
+              const cards = items
+                .map((op) => {
+                  const active = op.id === state.selectedOperationId
+                  const style = state.filters.animations
+                    ? `style="animation-delay:${delay * 28}ms"`
+                    : ''
+                  delay += 1
+
+                  return `
+                    <article class="endpoint-card ${active ? 'endpoint-card--active' : ''}" data-op-id="${sanitize(op.id)}" ${style}>
+                      <div>
+                        <span class="${methodClass(op.method)}">${op.method.toUpperCase()}</span>
+                        <span class="endpoint-path">${sanitize(op.path)}</span>
+                      </div>
+                      <p class="endpoint-summary">${sanitize(op.summary)}</p>
+                    </article>
+                  `
+                })
+                .join('')
+
+              return `
+                <section class="tag-group">
+                  <h3 class="tag-title">${sanitize(tag)}</h3>
+                  ${cards}
+                </section>
+              `
+            })
+            .join('')
+
+          endpointListEl.querySelectorAll('[data-op-id]').forEach((card) => {
+            card.addEventListener('click', () => {
+              const nextId = card.getAttribute('data-op-id')
+              if (!nextId) return
+              state.selectedOperationId = nextId
+              state.selectedResponseDocIndex = 0
+              renderEndpointList()
+              renderSelectedOperation(true)
+            })
+          })
+
+          if (!operations.some((item) => item.id === state.selectedOperationId)) {
+            state.selectedOperationId = operations[0].id
+            state.selectedResponseDocIndex = 0
+            renderEndpointList()
+            renderSelectedOperation()
+          }
+        }
+
+        const buildRequestBodyTemplate = (op) => {
+          if (!op.requestBody) return ''
+          const requestBody = op.requestBody.$ref ? resolveRef(op.requestBody.$ref) : op.requestBody
+          const content = requestBody?.content || {}
+          const media = content['application/json'] || Object.values(content)[0]
+          if (!media?.schema) return ''
+
+          const sample = schemaExample(media.schema)
+          if (sample == null) return ''
+          return JSON.stringify(sample, null, 2)
+        }
+
+        const responseDocsFromOperation = (op) => {
+          const docs = Object.entries(op.responses || {})
+            .map(([status, response]) => {
+              const resolved = response?.$ref ? resolveRef(response.$ref) : response
+              const content = resolved?.content || {}
+              const media = content['application/json'] || Object.values(content)[0]
+              const schema = media?.schema
+              const sample = schema ? schemaExample(schema) : null
+              const exampleText = sample == null
+                ? 'Sem payload JSON documentado.'
+                : JSON.stringify(sample, null, 2)
+
+              return {
+                status,
+                description: resolved?.description || 'Sem descrição',
+                exampleText,
+              }
+            })
+            .sort((a, b) => {
+              const aNum = Number.parseInt(a.status, 10)
+              const bNum = Number.parseInt(b.status, 10)
+              if (Number.isNaN(aNum) && Number.isNaN(bNum)) return a.status.localeCompare(b.status)
+              if (Number.isNaN(aNum)) return 1
+              if (Number.isNaN(bNum)) return -1
+              return aNum - bNum
+            })
+
+          return docs
+        }
+
+        const animateDetailSwap = (paint) => {
+          if (!state.filters.animations) {
+            paint()
+            return
+          }
+
+          if (detailSwapTimer) {
+            clearTimeout(detailSwapTimer)
+            detailSwapTimer = null
+          }
+
+          detailContentEl.classList.remove('swap-in')
+          detailContentEl.classList.add('swap-out')
+
+          detailSwapTimer = setTimeout(() => {
+            paint()
+            detailContentEl.classList.remove('swap-out')
+            detailContentEl.classList.add('swap-in')
+            detailSwapTimer = setTimeout(() => {
+              detailContentEl.classList.remove('swap-in')
+            }, 190)
+          }, 120)
+        }
+
+        const syncResponseDocButtons = (activeIndex) => {
+          detailContentEl.querySelectorAll('[data-response-doc-index]').forEach((button, index) => {
+            button.classList.toggle('response-doc--active', index === activeIndex)
+          })
+        }
+
+        const renderParameterInput = (param) => {
+          const schema = resolveSchema(param.schema) || {}
+          const enumValues = Array.isArray(schema.enum) ? schema.enum : []
+          const inputId = `param-${param.in}-${param.name}`
+          const includeId = `include-${param.in}-${param.name}`
+          const required = Boolean(param.required)
+
+          let control = ''
+
+          if (enumValues.length > 0) {
+            control = `
+              <div class="select-wrap">
+                <select id="${sanitize(inputId)}" class="control control-select" data-param-value>
+                  ${enumValues
+                    .map((value) => `<option value="${sanitize(value)}">${sanitize(value)}</option>`)
+                    .join('')}
+                </select>
+              </div>
+            `
+          } else if (schema.type === 'boolean') {
+            control = `
+              <label class="switch" for="${sanitize(inputId)}">
+                <input id="${sanitize(inputId)}" type="checkbox" data-param-value />
+                <span class="track"></span>
+                <span>Ativo</span>
+              </label>
+            `
+          } else {
+            const typeAttr =
+              schema.type === 'integer' || schema.type === 'number'
+                ? 'number'
+                : schema.format === 'date'
+                  ? 'date'
+                  : 'text'
+
+            const placeholder = schema.example !== undefined
+              ? String(schema.example)
+              : schema.format === 'uuid'
+                ? '11111111-1111-1111-1111-111111111111'
+                : ''
+
+            control = `<input id="${sanitize(inputId)}" class="control" type="${typeAttr}" placeholder="${sanitize(placeholder)}" data-param-value />`
+          }
+
+          return `
+            <article class="param-card" data-param-name="${sanitize(param.name)}" data-param-in="${sanitize(param.in)}" data-param-required="${required ? '1' : '0'}">
+              <div class="param-top">
+                <span class="param-name">${sanitize(param.name)}</span>
+                <span class="param-in">${sanitize(param.in)}</span>
+                ${required ? '<span class="required-dot">Obrigatório</span>' : ''}
+              </div>
+              <p class="param-description">${sanitize(param.description || 'Sem descrição')}</p>
+              <div class="input-row">
+                ${
+                  required
+                    ? ''
+                    : `<label class="include-wrap check"><input id="${sanitize(includeId)}" type="checkbox" data-param-include /><span class="check-box"></span><span>Incluir parâmetro</span></label>`
+                }
+                ${control}
+              </div>
+            </article>
+          `
+        }
+
+        const renderSelectedOperation = (animated = false) => {
+          const op = state.operations.find((item) => item.id === state.selectedOperationId)
+          if (!op) {
+            detailContentEl.innerHTML = '<div class="empty-state">Selecione um endpoint para visualizar detalhes.</div>'
+            requestPreviewEl.textContent = 'Selecione um endpoint para montar a request.'
+            responsePreviewEl.textContent = 'A resposta aparecerá aqui após executar.'
+            schemaPreviewEl.textContent = 'O exemplo de resposta documentado aparecerá aqui.'
+            setResponseMeta('Nenhuma requisição executada.')
+            return
+          }
+
+          const paramsHtml = op.parameters.length
+            ? `<div class="param-grid">${op.parameters.map(renderParameterInput).join('')}</div>`
+            : '<div class="empty-state">Este endpoint não possui parâmetros.</div>'
+
+          const bodyTemplate = buildRequestBodyTemplate(op)
+          const bodySection = op.requestBody
+            ? `
+              <section class="section" id="section-body">
+                <div class="section-head">
+                  <h3 class="section-title">Body da request</h3>
+                </div>
+                <div class="section-body">
+                  <textarea id="request-body" class="textarea" spellcheck="false">${sanitize(bodyTemplate)}</textarea>
+                </div>
+              </section>
+            `
+            : ''
+
+          const responseDocs = responseDocsFromOperation(op)
+          const responseDocsHtml = responseDocs.length
+            ? `
+              <div class="response-doc-grid">
+                ${responseDocs
+                  .map(
+                    (doc, index) => `
+                      <button class="response-doc ${index === 0 ? 'response-doc--active' : ''}" type="button" data-response-doc-index="${index}">
+                        <span class="response-doc-line">
+                          <span class="response-doc-code">${sanitize(doc.status)}</span>
+                          <span class="response-doc-text">${sanitize(doc.description)}</span>
+                        </span>
+                      </button>
+                    `,
+                  )
+                  .join('')}
+              </div>
+            `
+            : '<div class="empty-state">Nenhuma resposta documentada no OpenAPI.</div>'
+
+          const badges = [
+            op.requiresApiKey ? '<span class="badge badge--api-key">X-API-Key</span>' : '',
+            op.requiresBearer ? '<span class="badge badge--bearer">Bearer</span>' : '',
+          ]
+            .filter(Boolean)
+            .join('')
+
+          const successResponse = responseDocs.find((doc) => /^2\d\d$/.test(doc.status))
+          const authLabel = op.requiresBearer ? 'X-API-Key + Bearer' : op.requiresApiKey ? 'X-API-Key' : 'Sem autenticação'
+
+          const paint = () => {
+            detailContentEl.innerHTML = `
+              <article class="operation-head">
+                <h2 class="operation-title">
+                  <span class="${methodClass(op.method)}">${op.method.toUpperCase()}</span>
+                  <span class="operation-path">${sanitize(op.path)}</span>
+                </h2>
+                <p class="operation-description">${sanitize(op.summary)}</p>
+                ${op.description ? `<p class="operation-description">${sanitize(op.description)}</p>` : ''}
+                <div class="security-badges">${badges || '<span class="badge">Sem auth declarada</span>'}</div>
+              </article>
+
+              <section class="section">
+                <div class="section-head">
+                  <h3 class="section-title">Resumo técnico</h3>
+                </div>
+                <div class="section-body">
+                  <div class="endpoint-meta-grid">
+                    <article class="endpoint-meta-card">
+                      <small>Método</small>
+                      <strong>${sanitize(op.method.toUpperCase())}</strong>
+                    </article>
+                    <article class="endpoint-meta-card">
+                      <small>Auth</small>
+                      <strong>${sanitize(authLabel)}</strong>
+                    </article>
+                    <article class="endpoint-meta-card">
+                      <small>Retorno esperado</small>
+                      <strong>${sanitize(successResponse?.status || 'N/A')}</strong>
+                    </article>
+                    <article class="endpoint-meta-card">
+                      <small>Parâmetros</small>
+                      <strong>${sanitize(String(op.parameters.length))}</strong>
+                    </article>
+                  </div>
+                </div>
+              </section>
+
+              <section class="section">
+                <div class="section-head">
+                  <h3 class="section-title">Passos de uso</h3>
+                </div>
+                <div class="section-body">
+                  <ol class="helper-list">
+                    <li>Preencha os parâmetros obrigatórios e opcionais que deseja enviar.</li>
+                    <li>Revise o body JSON (quando existir) e acompanhe o cURL no painel direito.</li>
+                    <li>Execute e compare a resposta real com os retornos documentados no OpenAPI.</li>
+                  </ol>
+                </div>
+              </section>
+
+              <section class="section" id="section-params">
+                <div class="section-head">
+                  <h3 class="section-title">Parâmetros</h3>
+                </div>
+                <div class="section-body">${paramsHtml}</div>
+              </section>
+
+              ${bodySection}
+
+              <section class="section">
+                <div class="section-head">
+                  <h3 class="section-title">Respostas documentadas</h3>
+                </div>
+                <div class="section-body">${responseDocsHtml}</div>
+              </section>
+
+              <section class="section">
+                <div class="section-head">
+                  <h3 class="section-title">Ações</h3>
+                </div>
+                <div class="section-body">
+                  <div class="exec-row">
+                    <button id="execute-request" class="btn btn-primary" type="button">Executar request</button>
+                    <button id="copy-curl" class="btn btn-secondary" type="button">Copiar cURL</button>
+                  </div>
+                </div>
+              </section>
+            `
+
+              const applyLivePreview = () => {
+                try {
+                  const values = collectRequestValues(op, { strict: false })
+                  const headers = { ...buildAuthHeaders(), ...(values.headers || {}) }
+                  const url = buildRequestUrl(op, values)
+                  const previewBody = values.bodyRaw || (values.body ? JSON.stringify(values.body) : '')
+                  requestPreviewEl.textContent = buildPreviewCurl(op, {
+                  url,
+                  headers,
+                  body: previewBody,
+                })
+              } catch {
+                requestPreviewEl.textContent = 'Não foi possível gerar cURL de prévia com os valores atuais.'
+              }
+            }
+
+            detailContentEl.querySelector('#execute-request')?.addEventListener('click', () => executeRequest(op))
+            detailContentEl.querySelector('#copy-curl')?.addEventListener('click', async () => {
+              try {
+                await navigator.clipboard.writeText(requestPreviewEl.textContent)
+                setResponseStatus('cURL copiado', 'ok')
+              } catch {
+                setResponseStatus('Falha ao copiar cURL', 'warn')
+              }
+            })
+
+            detailContentEl.querySelectorAll('[data-response-doc-index]').forEach((button) => {
+              button.addEventListener('click', () => {
+                const idx = Number.parseInt(button.getAttribute('data-response-doc-index') || '0', 10)
+                const maxIndex = Math.max(responseDocs.length - 1, 0)
+                const safeIndex = Number.isNaN(idx) ? 0 : Math.min(Math.max(idx, 0), maxIndex)
+                state.selectedResponseDocIndex = safeIndex
+                schemaPreviewEl.textContent = responseDocs[safeIndex]?.exampleText || 'Sem payload JSON documentado.'
+                syncResponseDocButtons(safeIndex)
+              })
+            })
+
+            detailContentEl.querySelectorAll('input, select, textarea').forEach((field) => {
+              field.addEventListener('input', applyLivePreview)
+              field.addEventListener('change', applyLivePreview)
+            })
+
+            const safeResponseDocIndex = responseDocs.length
+              ? Math.min(state.selectedResponseDocIndex, responseDocs.length - 1)
+              : 0
+            state.selectedResponseDocIndex = safeResponseDocIndex
+            schemaPreviewEl.textContent =
+              responseDocs[safeResponseDocIndex]?.exampleText || 'Sem payload JSON documentado.'
+            syncResponseDocButtons(safeResponseDocIndex)
+            responsePreviewEl.textContent = 'A resposta aparecerá aqui após executar.'
+            setResponseMeta('Nenhuma requisição executada para este endpoint.')
+            applyLivePreview()
+          }
+
+          if (animated) {
+            animateDetailSwap(paint)
+            return
+          }
+
+          paint()
+        }
+
+        const buildAuthHeaders = () => {
+          return {
+            'X-API-Key': state.credentials.apiKey,
+            Authorization: `Bearer ${state.credentials.bearer}`,
+          }
+        }
+
+        const buildRequestUrl = (op, values) => {
+          const selectedServer = state.selectedServer || '/'
+          const base = new URL(selectedServer, window.location.origin)
+
+          let path = op.path
+          for (const [key, value] of Object.entries(values.path || {})) {
+            path = path.replace(`{${key}}`, encodeURIComponent(value))
+          }
+
+          const target = new URL(path, base)
+          for (const [key, value] of Object.entries(values.query || {})) {
+            target.searchParams.set(key, value)
+          }
+
+          return target.toString()
+        }
+
+        const buildPreviewCurl = (op, values) => {
+          const lines = [`curl -X ${op.method.toUpperCase()} '${values.url}'`]
+          for (const [key, value] of Object.entries(values.headers || {})) {
+            lines.push(`  -H '${key}: ${value}'`)
+          }
+          lines.push("  -H 'accept: application/json'")
+
+          if (values.body && ['post', 'put', 'patch'].includes(op.method)) {
+            lines.push("  -H 'content-type: application/json'")
+            lines.push(`  --data '${values.body.replaceAll("'", "\\'")}'`)
+          }
+
+          return lines.join(' \\\n')
+        }
+
+        const collectRequestValues = (op, options = {}) => {
+          const strict = options.strict ?? true
+          const pathValues = {}
+          const queryValues = {}
+          const headerValues = {}
+
+          detailContentEl.querySelectorAll('.param-card').forEach((card) => {
+            const name = card.getAttribute('data-param-name')
+            const location = card.getAttribute('data-param-in')
+            const required = card.getAttribute('data-param-required') === '1'
+            if (!name || !location) return
+
+            const includeInput = card.querySelector('[data-param-include]')
+            const include = required || (includeInput ? includeInput.checked : false)
+            if (!include) return
+
+            const valueInput = card.querySelector('[data-param-value]')
+            if (!valueInput) return
+
+            let value = ''
+            if (valueInput.type === 'checkbox') {
+              value = valueInput.checked ? 'true' : 'false'
+            } else {
+              value = String(valueInput.value ?? '').trim()
+            }
+
+            if (!value && required) {
+              if (strict) {
+                throw new Error(`Parâmetro obrigatório ausente: ${name}`)
+              }
+              return
+            }
+
+            if (!value && !required) return
+
+            if (location === 'path') pathValues[name] = value
+            if (location === 'query') queryValues[name] = value
+            if (location === 'header') headerValues[name] = value
+          })
+
+          const bodyInput = detailContentEl.querySelector('#request-body')
+          let body = null
+          let bodyRaw = ''
+          if (bodyInput && ['post', 'put', 'patch'].includes(op.method)) {
+            bodyRaw = String(bodyInput.value || '').trim()
+            if (bodyRaw) {
+              try {
+                body = JSON.parse(bodyRaw)
+              } catch {
+                if (strict) {
+                  throw new Error('Body JSON inválido.')
+                }
+              }
+            }
+          }
+
+          return { path: pathValues, query: queryValues, headers: headerValues, body, bodyRaw }
+        }
+
+        const formatJson = (value) => {
+          if (typeof value === 'string') return value
+          try {
+            return JSON.stringify(value, null, 2)
+          } catch {
+            return String(value)
+          }
+        }
+
+        const executeRequest = async (op) => {
+          try {
+            const values = collectRequestValues(op)
+            const headers = { ...buildAuthHeaders(), ...(values.headers || {}) }
+            const url = buildRequestUrl(op, values)
+
+            const previewBody = values.body ? JSON.stringify(values.body) : ''
+            requestPreviewEl.textContent = buildPreviewCurl(op, {
+              url,
+              headers,
+              body: previewBody,
+            })
+
+            setResponseStatus('Executando...', 'warn')
+            setResponseMeta(`${op.method.toUpperCase()} ${url}`)
+            responsePreviewEl.innerHTML = `
+              <div class="skeleton skeleton-line" style="width:84%"></div>
+              <div class="skeleton skeleton-line" style="width:96%"></div>
+              <div class="skeleton skeleton-line" style="width:62%"></div>
+              <div class="skeleton skeleton-line" style="width:88%"></div>
+            `
+
+            const started = performance.now()
+            const response = await fetch(url, {
+              method: op.method.toUpperCase(),
+              headers: {
+                ...headers,
+                Accept: 'application/json',
+                ...(values.body ? { 'Content-Type': 'application/json' } : {}),
+              },
+              body: values.body ? JSON.stringify(values.body) : undefined,
+            })
+
+            const elapsed = Math.round(performance.now() - started)
+            const text = await response.text()
+            let payload
+            try {
+              payload = text ? JSON.parse(text) : null
+            } catch {
+              payload = text
+            }
+
+            responsePreviewEl.textContent = formatJson(payload)
+            setResponseMeta(`${op.method.toUpperCase()} ${url} • ${elapsed}ms`)
+
+            if (response.ok) {
+              setResponseStatus(`${response.status} • ${elapsed}ms`, 'ok')
+            } else if (response.status >= 400 && response.status < 500) {
+              setResponseStatus(`${response.status} • ${elapsed}ms`, 'warn')
+            } else {
+              setResponseStatus(`${response.status} • ${elapsed}ms`, 'error')
+            }
+          } catch (error) {
+            responsePreviewEl.textContent = error instanceof Error ? error.message : 'Erro inesperado ao executar request.'
+            setResponseMeta('Falha ao executar request.')
+            setResponseStatus('Erro de execução', 'error')
+          }
+        }
+
+        const applyServers = () => {
+          const servers = Array.isArray(state.spec?.servers) ? state.spec.servers : []
+          const options = servers.length > 0 ? servers : [{ url: '/', description: 'Current origin' }]
+
+          serverSelectEl.innerHTML = options
+            .map((server) => {
+              const url = server.url || '/'
+              const label = `${url} ${server.description ? `- ${server.description}` : ''}`
+              return `<option value="${sanitize(url)}">${sanitize(label)}</option>`
+            })
+            .join('')
+
+          state.selectedServer = options[0].url || '/'
+          serverSelectEl.value = state.selectedServer
+        }
+
+        const loadSpecAndRender = async () => {
+          showLoadingSkeleton()
+          setResponseStatus('Loading spec', 'warn')
+
+          try {
+            state.spec = await requestSpec()
+            state.operations = flattenOperations()
+            applyServers()
+            renderEndpointList()
+            renderSelectedOperation()
+            setResponseStatus('Pronto', 'ok')
+          } catch (error) {
+            const message = error instanceof Error ? error.message : 'Falha ao carregar spec.'
+            endpointListEl.innerHTML = `<div class="empty-state">${sanitize(message)}</div>`
+            detailContentEl.innerHTML = '<div class="empty-state">Não foi possível renderizar a documentação.</div>'
+            responsePreviewEl.textContent = message
+            schemaPreviewEl.textContent = message
+            setResponseMeta('Erro ao carregar especificação OpenAPI.')
+            setResponseStatus('Falha', 'error')
+            throw error
+          }
+        }
+
+        const handleCredentialsSubmit = async () => {
+          const apiKey = String(modalApiKeyEl.value || '').trim()
+          const email = String(modalEmailEl.value || '').trim().toLowerCase()
+          const password = String(modalPasswordEl.value || '')
+
+          if (!apiKey || !email || !password) {
+            setModalMessage('Preencha X-API-Key, email e senha.', true)
+            return
+          }
+
+          try {
+            setModalMessage('Autenticando no Supabase...')
+            const bearer = await requestLoginToken({ apiKey, email, password })
+            persistCredentials(apiKey, email, bearer)
+            setModalMessage('JWT obtido. Carregando documentação...')
+            await loadSpecAndRender()
+            closeCredentialsModal()
+            unlockDocs()
+          } catch (error) {
+            const message = error instanceof Error ? error.message : 'Falha inesperada na autenticação.'
+            setModalMessage(message, true)
+            lockDocs()
+          }
+        }
+
+        const initTopbarEvents = () => {
+          searchEndpointEl.addEventListener('input', () => {
+            state.filters.search = searchEndpointEl.value
+            renderEndpointList()
+          })
+
+          onlyBearerEl.addEventListener('change', () => {
+            state.filters.onlyBearer = onlyBearerEl.checked
+            renderEndpointList()
+          })
+
+          toggleAnimationsEl.addEventListener('change', () => {
+            state.filters.animations = toggleAnimationsEl.checked
+          })
+
+          serverSelectEl.addEventListener('change', () => {
+            state.selectedServer = serverSelectEl.value
+            renderSelectedOperation()
+          })
+
+          openCredentialsBtn.addEventListener('click', () => {
+            openCredentialsModal()
+            lockDocs()
+          })
+
+          clearCredentialsBtn.addEventListener('click', () => {
+            clearCredentials()
+          })
+        }
+
+        const init = async () => {
+          initTopbarEvents()
+          modalSaveEl.addEventListener('click', handleCredentialsSubmit)
+
+          readStoredCredentials()
+          showLoadingSkeleton()
+
+          if (state.credentials.apiKey && state.credentials.bearer) {
+            modalApiKeyEl.value = state.credentials.apiKey
+            modalEmailEl.value = state.credentials.email
+            setModalMessage('Reutilizando sessão salva...')
+            try {
+              await loadSpecAndRender()
+              closeCredentialsModal()
+              unlockDocs()
+              return
+            } catch {
+              openCredentialsModal()
+              lockDocs()
+              setModalMessage('Sessão expirada. Informe email e senha para gerar novo JWT.', true)
+              return
+            }
+          }
+
+          openCredentialsModal()
+          lockDocs()
+          setModalMessage('Insira as credenciais para continuar.')
+        }
+
+        init().catch((error) => {
+          endpointListEl.innerHTML = `<div class="empty-state">${sanitize(error?.message || 'Erro inesperado.')}</div>`
+          setResponseStatus('Erro', 'error')
+        })
+      })()
+    </script>
+  </body>
+</html>
