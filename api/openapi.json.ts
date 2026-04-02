@@ -8,3 +8,4 @@ export default createPublicHandler(
     jsonResponse(res, 200, spec)
   },
 )
+
