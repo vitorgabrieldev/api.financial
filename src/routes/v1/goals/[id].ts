@@ -1,14 +1,14 @@
-import { AppError, NotFoundError } from '../../../src/core/errors'
+import { AppError, NotFoundError } from '../../../core/errors'
 import {
   createAuthHandler,
   jsonResponse,
   parseJsonBody,
-} from '../../../src/core/http'
-import { requireModulePermission } from '../../../src/core/permissions'
+} from '../../../core/http'
+import { requireModulePermission } from '../../../core/permissions'
 import {
   goalUpdateSchema,
   idParamSchema,
-} from '../../../src/core/schemas'
+} from '../../../core/schemas'
 
 const readId = (value: string | string[] | undefined, requestUrl?: string): string => {
   const raw = Array.isArray(value) ? value[0] : value

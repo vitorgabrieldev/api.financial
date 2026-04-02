@@ -5,6 +5,12 @@
   "installCommand": "npm install",
   "buildCommand": "npm run build",
   "outputDirectory": ".",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api?__route_path=$1"
+    }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",
@@ -28,10 +34,6 @@
         {
           "key": "Strict-Transport-Security",
           "value": "max-age=63072000; includeSubDomains; preload"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
         }
       ]
     }

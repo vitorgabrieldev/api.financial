@@ -1,14 +1,14 @@
-import { AppError, NotFoundError } from '../../../src/core/errors'
+import { AppError, NotFoundError } from '../../../core/errors'
 import {
   createAuthHandler,
   jsonResponse,
   parseJsonBody,
-} from '../../../src/core/http'
-import { requireModulePermission } from '../../../src/core/permissions'
+} from '../../../core/http'
+import { requireModulePermission } from '../../../core/permissions'
 import {
-  accountUpdateSchema,
+  categoryUpdateSchema,
   idParamSchema,
-} from '../../../src/core/schemas'
+} from '../../../core/schemas'
 
 const readId = (value: string | string[] | undefined, requestUrl?: string): string => {
   const raw = Array.isArray(value) ? value[0] : value
@@ -29,10 +29,10 @@ export default createAuthHandler(
     const id = readId(req.query.id, req.url)
 
     if (req.method === 'GET') {
-      await requireModulePermission(supabase, userId, 'accounts', 'view')
+      await requireModulePermission(supabase, userId, 'categories', 'view')
 
       const { data, error } = await supabase
-        .from('accounts')
+        .from('categories')
         .select('*')
         .eq('user_id', userId)
         .eq('id', id)
@@ -41,14 +41,14 @@ export default createAuthHandler(
       if (error) {
         throw new AppError(
           500,
-          `Falha ao carregar conta: ${error.message}`,
+          `Falha ao carregar categoria: ${error.message}`,
           undefined,
-          'ACCOUNTS_GET_FAILED',
+          'CATEGORIES_GET_FAILED',
         )
       }
 
       if (!data) {
-        throw new NotFoundError('Conta não encontrada.')
+        throw new NotFoundError('Categoria não encontrada.')
       }
 
       jsonResponse(res, 200, { data })
@@ -56,12 +56,12 @@ export default createAuthHandler(
     }
 
     if (req.method === 'PATCH') {
-      await requireModulePermission(supabase, userId, 'accounts', 'edit')
+      await requireModulePermission(supabase, userId, 'categories', 'edit')
 
-      const payload = accountUpdateSchema.parse(await parseJsonBody(req))
+      const payload = categoryUpdateSchema.parse(await parseJsonBody(req))
 
       const { data, error } = await supabase
-        .from('accounts')
+        .from('categories')
         .update(payload)
         .eq('user_id', userId)
         .eq('id', id)
@@ -71,24 +71,24 @@ export default createAuthHandler(
       if (error) {
         throw new AppError(
           400,
-          `Falha ao atualizar conta: ${error.message}`,
+          `Falha ao atualizar categoria: ${error.message}`,
           undefined,
-          'ACCOUNTS_UPDATE_FAILED',
+          'CATEGORIES_UPDATE_FAILED',
         )
       }
 
       if (!data) {
-        throw new NotFoundError('Conta não encontrada.')
+        throw new NotFoundError('Categoria não encontrada.')
       }
 
       jsonResponse(res, 200, { data })
       return
     }
 
-    await requireModulePermission(supabase, userId, 'accounts', 'delete')
+    await requireModulePermission(supabase, userId, 'categories', 'delete')
 
     const { data, error } = await supabase
-      .from('accounts')
+      .from('categories')
       .delete()
       .eq('user_id', userId)
       .eq('id', id)
@@ -98,14 +98,14 @@ export default createAuthHandler(
     if (error) {
       throw new AppError(
         400,
-        `Falha ao excluir conta: ${error.message}`,
+        `Falha ao excluir categoria: ${error.message}`,
         undefined,
-        'ACCOUNTS_DELETE_FAILED',
+        'CATEGORIES_DELETE_FAILED',
       )
     }
 
     if (!data) {
-      throw new NotFoundError('Conta não encontrada.')
+      throw new NotFoundError('Categoria não encontrada.')
     }
 
     jsonResponse(res, 200, { deleted: true, id: data.id })

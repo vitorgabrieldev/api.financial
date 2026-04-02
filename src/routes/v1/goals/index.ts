@@ -1,31 +1,33 @@
-import { AppError } from '../../../src/core/errors'
+import { AppError } from '../../../core/errors'
 import {
   createAuthHandler,
   jsonResponse,
   parseJsonBody,
   queryToObject,
-} from '../../../src/core/http'
-import { buildPagination, resolvePagination } from '../../../src/core/pagination'
-import { requireModulePermission } from '../../../src/core/permissions'
+} from '../../../core/http'
+import { buildPagination, resolvePagination } from '../../../core/pagination'
+import { requireModulePermission } from '../../../core/permissions'
 import {
-  CATEGORY_SORT_FIELDS,
-  categoryCreateSchema,
-  categoryListQuerySchema,
-} from '../../../src/core/schemas'
+  GOAL_SORT_FIELDS,
+  goalCreateSchema,
+  goalListQuerySchema,
+} from '../../../core/schemas'
 
-const categorySortColumnMap: Record<(typeof CATEGORY_SORT_FIELDS)[number], string> = {
-  name: 'name',
-  kind: 'kind',
+const goalSortColumnMap: Record<(typeof GOAL_SORT_FIELDS)[number], string> = {
   created_at: 'created_at',
+  name: 'name',
+  target_amount: 'target_amount',
+  current_amount: 'current_amount',
+  status: 'status',
 }
 
 export default createAuthHandler(
   { methods: ['GET', 'POST'] },
   async ({ req, res, supabase, userId, query }) => {
     if (req.method === 'GET') {
-      await requireModulePermission(supabase, userId, 'categories', 'list')
+      await requireModulePermission(supabase, userId, 'goals', 'list')
 
-      const filters = categoryListQuerySchema.parse(queryToObject(query))
+      const filters = goalListQuerySchema.parse(queryToObject(query))
       const pagination = resolvePagination({
         limit: filters.limit,
         offset: filters.offset,
@@ -34,18 +36,18 @@ export default createAuthHandler(
         order: filters.order,
       })
       const sortColumn =
-        categorySortColumnMap[pagination.sort as keyof typeof categorySortColumnMap]
+        goalSortColumnMap[pagination.sort as keyof typeof goalSortColumnMap]
       const ascending = pagination.order === 'asc'
 
       let dbQuery = supabase
-        .from('categories')
+        .from('goals')
         .select('*', { count: 'exact' })
         .eq('user_id', userId)
         .order(sortColumn, { ascending })
         .order('id', { ascending })
 
-      if (filters.kind) {
-        dbQuery = dbQuery.eq('kind', filters.kind)
+      if (filters.status) {
+        dbQuery = dbQuery.eq('status', filters.status)
       }
 
       if (filters.search) {
@@ -59,9 +61,9 @@ export default createAuthHandler(
       if (error) {
         throw new AppError(
           500,
-          `Falha ao carregar categorias: ${error.message}`,
+          `Falha ao carregar metas: ${error.message}`,
           undefined,
-          'CATEGORIES_LIST_FAILED',
+          'GOALS_LIST_FAILED',
         )
       }
 
@@ -81,12 +83,12 @@ export default createAuthHandler(
       return
     }
 
-    await requireModulePermission(supabase, userId, 'categories', 'create')
+    await requireModulePermission(supabase, userId, 'goals', 'create')
 
-    const payload = categoryCreateSchema.parse(await parseJsonBody(req))
+    const payload = goalCreateSchema.parse(await parseJsonBody(req))
 
     const { data, error } = await supabase
-      .from('categories')
+      .from('goals')
       .insert({
         user_id: userId,
         ...payload,
@@ -97,9 +99,9 @@ export default createAuthHandler(
     if (error) {
       throw new AppError(
         400,
-        `Falha ao criar categoria: ${error.message}`,
+        `Falha ao criar meta: ${error.message}`,
         undefined,
-        'CATEGORIES_CREATE_FAILED',
+        'GOALS_CREATE_FAILED',
       )
     }
 

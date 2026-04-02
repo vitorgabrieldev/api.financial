@@ -1,11 +1,11 @@
-import { AppError } from '../../../src/core/errors'
+import { AppError } from '../../../core/errors'
 import {
   createAuthHandler,
   jsonResponse,
   queryToObject,
-} from '../../../src/core/http'
-import { requireModulePermission } from '../../../src/core/permissions'
-import { reportQuerySchema } from '../../../src/core/schemas'
+} from '../../../core/http'
+import { requireModulePermission } from '../../../core/permissions'
+import { reportQuerySchema } from '../../../core/schemas'
 
 export default createAuthHandler(
   { methods: ['GET'] },

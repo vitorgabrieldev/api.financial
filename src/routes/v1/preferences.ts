@@ -1,10 +1,10 @@
-import { AppError } from '../../src/core/errors'
+import { AppError } from '../../core/errors'
 import {
   createAuthHandler,
   jsonResponse,
   parseJsonBody,
-} from '../../src/core/http'
-import { preferencesUpdateSchema } from '../../src/core/schemas'
+} from '../../core/http'
+import { preferencesUpdateSchema } from '../../core/schemas'
 
 export default createAuthHandler(
   { methods: ['GET', 'PATCH'] },

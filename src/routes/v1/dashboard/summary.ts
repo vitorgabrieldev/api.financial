@@ -1,12 +1,12 @@
-import { AppError } from '../../../src/core/errors'
+import { AppError } from '../../../core/errors'
 import {
   createAuthHandler,
   jsonResponse,
   queryToObject,
-} from '../../../src/core/http'
-import { roundMoney, toNumber } from '../../../src/core/number'
-import { requireModulePermission } from '../../../src/core/permissions'
-import { reportQuerySchema } from '../../../src/core/schemas'
+} from '../../../core/http'
+import { roundMoney, toNumber } from '../../../core/number'
+import { requireModulePermission } from '../../../core/permissions'
+import { reportQuerySchema } from '../../../core/schemas'
 
 const toIsoDate = (value: Date): string => value.toISOString().slice(0, 10)
 

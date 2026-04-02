@@ -1,4 +1,4 @@
-import { createPublicHandler, jsonResponse } from '../../src/core/http'
+import { createPublicHandler, jsonResponse } from '../../core/http'
 
 export default createPublicHandler({ methods: ['GET'] }, async ({ res }) => {
   jsonResponse(res, 200, {

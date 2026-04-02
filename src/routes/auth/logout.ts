@@ -1,11 +1,11 @@
 import { z } from 'zod'
-import { AppError, UnauthorizedError } from '../../src/core/errors'
-import { env } from '../../src/core/env'
+import { AppError, UnauthorizedError } from '../../core/errors'
+import { env } from '../../core/env'
 import {
   createPublicHandler,
   jsonResponse,
   parseJsonBody,
-} from '../../src/core/http'
+} from '../../core/http'
 
 const authLogoutSchema = z.object({
   access_token: z.string().trim().min(1).optional(),

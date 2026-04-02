@@ -1,17 +1,16 @@
 import { createClient } from '@supabase/supabase-js'
 import { z } from 'zod'
-import { serializeAuthSession } from '../../src/core/auth-session'
-import { AppError } from '../../src/core/errors'
-import { env } from '../../src/core/env'
+import { serializeAuthSession } from '../../core/auth-session'
+import { AppError } from '../../core/errors'
+import { env } from '../../core/env'
 import {
   createPublicHandler,
   jsonResponse,
   parseJsonBody,
-} from '../../src/core/http'
+} from '../../core/http'
 
-const authLoginSchema = z.object({
-  email: z.email(),
-  password: z.string().min(6),
+const authRefreshSchema = z.object({
+  refresh_token: z.string().trim().min(1),
 })
 
 const sharedAuthOptions = {
@@ -25,7 +24,7 @@ const sharedAuthOptions = {
 export default createPublicHandler(
   { methods: ['POST'] },
   async ({ req, res }) => {
-    const payload = authLoginSchema.parse(await parseJsonBody(req))
+    const payload = authRefreshSchema.parse(await parseJsonBody(req))
 
     const supabase = createClient(
       env.supabaseUrl,
@@ -33,23 +32,22 @@ export default createPublicHandler(
       sharedAuthOptions,
     )
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: payload.email,
-      password: payload.password,
+    const { data, error } = await supabase.auth.refreshSession({
+      refresh_token: payload.refresh_token,
     })
 
     if (error || !data.session?.access_token) {
       throw new AppError(
         401,
-        error?.message || 'Falha ao autenticar no Supabase.',
+        error?.message || 'Falha ao renovar sessão do usuário.',
         undefined,
-        'AUTH_LOGIN_FAILED',
+        'AUTH_REFRESH_FAILED',
       )
     }
 
     jsonResponse(res, 200, {
       data: {
-        ...serializeAuthSession(data.session, data.user),
+        ...serializeAuthSession(data.session, data.user ?? data.session.user ?? null),
       },
     })
   },
