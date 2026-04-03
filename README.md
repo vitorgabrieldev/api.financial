@@ -1,4 +1,4 @@
-# My Financial Organization - Financial Core API
+# api.financial-core
 
 Core financeiro API-first para centralizar suas informações de finanças pessoais e integrar com qualquer cliente (web, app mobile, automações e agentes AI).
 

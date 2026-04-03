@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Financial Organization :: Technical Runtime</title>
+    <title>api.financial-core</title>
     <style>
       :root {
         --purple: #820ad1;
@@ -139,6 +139,31 @@
         color: var(--muted);
       }
 
+      .matrix-wrap {
+        overflow-x: auto;
+      }
+
+      .matrix {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 0.82rem;
+      }
+
+      .matrix th,
+      .matrix td {
+        border: 1px solid var(--line);
+        padding: 7px 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      .matrix th {
+        background: #efe1ff;
+        font-weight: 700;
+        color: #2c1840;
+      }
+
       @media (max-width: 840px) {
         .top {
           flex-direction: column;
@@ -160,7 +185,7 @@
     <main>
       <section class="panel">
         <div class="top">
-          <h1>My Financial Organization :: API Runtime</h1>
+          <h1>api.financial-core</h1>
           <div class="status">
             <span class="dot"></span>
             <span>service online</span>
@@ -169,7 +194,8 @@
 
         <p>
           Backend de produção para operações financeiras, autenticação e
-          controle de acesso.
+          controle de acesso, com foco de uso primário pelo próprio autor para
+          organizar sua rotina financeira pessoal.
         </p>
 
         <div class="meta">
@@ -321,13 +347,81 @@ idempotency behavior:
         <h2 class="section-title">Operational Notes</h2>
         <div class="meta" style="margin-top: 0; border-top: 0; padding-top: 0">
           <div class="row"><div class="key">deployment_target</div><div class="value">Vercel Hobby-compatible (single serverless function dispatch)</div></div>
+          <div class="row"><div class="key">product_focus</div><div class="value">author-first personal financial organization platform</div></div>
           <div class="row"><div class="key">build_guardrails</div><div class="value">typecheck gate + eslint + vitest suite</div></div>
           <div class="row"><div class="key">observability_mode</div><div class="value">runtime logs + deployment logs + explicit error codes</div></div>
           <div class="row"><div class="key">consumer_interfaces</div><div class="value">HTTP clients, generated SDK, docs UI, automated agents</div></div>
           <div class="row"><div class="key">failure_contract</div><div class="value">{ code, error, details } deterministic payload in all API layers</div></div>
-          <div class="row"><div class="key">intended_audience</div><div class="value">backend, platform, data and integration engineering</div></div>
+          <div class="row"><div class="key">intended_audience</div><div class="value">primary: project author | secondary: engineering and integrations</div></div>
         </div>
         <p class="small">Interface intentionally technical. Non-authenticated human browsing is not the primary product surface.</p>
+      </section>
+
+      <section class="panel">
+        <h2 class="section-title">Public Technical Matrix</h2>
+        <p class="small">Perfil técnico público. Nenhum segredo, credencial ou detalhe operacional sensível é exibido abaixo.</p>
+        <div class="matrix-wrap" style="margin-top: 10px">
+          <table class="matrix">
+            <thead>
+              <tr>
+                <th style="width: 34%">item</th>
+                <th style="width: 66%">public value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>runtime</td><td>Node.js serverless runtime</td></tr>
+              <tr><td>language</td><td>TypeScript (strict mode)</td></tr>
+              <tr><td>deployment_model</td><td>single-function dispatch architecture</td></tr>
+              <tr><td>routing_strategy</td><td>central router with lazy-loaded modules and in-memory handler cache</td></tr>
+              <tr><td>openapi_version</td><td>OpenAPI 3.1.0</td></tr>
+              <tr><td>api_semver_current</td><td>versioned release stream (current stable branch active)</td></tr>
+              <tr><td>total_paths</td><td>documented path set available via OpenAPI</td></tr>
+              <tr><td>total_operations</td><td>multi-operation contract across read/write/auth/report domains</td></tr>
+              <tr><td>method_distribution</td><td>GET/POST/PATCH/DELETE profile</td></tr>
+              <tr><td>auth_chain</td><td>API key gate + user bearer token for protected operations</td></tr>
+              <tr><td>api_key_validation_mode</td><td>timing-safe comparison</td></tr>
+              <tr><td>token_provider</td><td>external identity provider (Supabase Auth)</td></tr>
+              <tr><td>token_refresh_flow</td><td>dedicated refresh operation with session renewal contract</td></tr>
+              <tr><td>session_revocation_flow</td><td>dedicated logout/revocation operation</td></tr>
+              <tr><td>rbac_modules_count</td><td>module-based access partitions enabled</td></tr>
+              <tr><td>rbac_actions_count</td><td>action set: view/list/create/edit/delete</td></tr>
+              <tr><td>permission_resolution_logic</td><td>module/action permission lookup with admin override</td></tr>
+              <tr><td>admin_bypass_rules</td><td>privileged profile may bypass module-level action checks</td></tr>
+              <tr><td>validation_engine</td><td>Zod runtime schemas</td></tr>
+              <tr><td>validation_error_contract</td><td>structured 422 payload with normalized details</td></tr>
+              <tr><td>domain_enum_matrix</td><td>typed enums for account/category/transaction/goal/recurrence domains</td></tr>
+              <tr><td>currency_format_policy</td><td>ISO 3-letter uppercase currency code</td></tr>
+              <tr><td>date_format_policy</td><td>strict YYYY-MM-DD input policy</td></tr>
+              <tr><td>uuid_enforcement_policy</td><td>resource identifiers validated as UUID</td></tr>
+              <tr><td>pagination_limits</td><td>bounded pagination window with documented limits</td></tr>
+              <tr><td>sorting_strategy</td><td>deterministic sort/order strategy per collection domain</td></tr>
+              <tr><td>filtering_capabilities</td><td>query-level filters per resource collection</td></tr>
+              <tr><td>idempotency_scope</td><td>mutating methods eligible for idempotency controls</td></tr>
+              <tr><td>idempotency_fingerprint_algorithm</td><td>request fingerprint hashing with stable body serialization</td></tr>
+              <tr><td>idempotency_ttl</td><td>bounded replay retention window</td></tr>
+              <tr><td>idempotency_replay_header</td><td>explicit replay marker in response headers</td></tr>
+              <tr><td>idempotency_conflict_code</td><td>conflict response when same key is reused with divergent payload</td></tr>
+              <tr><td>http_error_schema</td><td>normalized error envelope: code + message + details</td></tr>
+              <tr><td>http_status_mapping_table</td><td>consistent status mapping across validation/auth/domain/internal errors</td></tr>
+              <tr><td>security_headers_profile</td><td>HSTS + CSP + anti-frame + MIME hardening headers</td></tr>
+              <tr><td>csp_policy</td><td>restricted content security policy for API responses</td></tr>
+              <tr><td>cors_policy</td><td>explicit allowed headers/methods with configurable origin</td></tr>
+              <tr><td>hsts_policy</td><td>strict transport security enabled</td></tr>
+              <tr><td>rate_limit_strategy</td><td>application-layer controls; edge throttling evolvable</td></tr>
+              <tr><td>database_entities_count</td><td>multiple core entities for preferences, ledger, goals, and authz</td></tr>
+              <tr><td>reporting_views_count</td><td>dedicated aggregated reporting surfaces</td></tr>
+              <tr><td>migration_timeline</td><td>timestamped SQL migration chain with incremental evolution</td></tr>
+              <tr><td>schema_evolution_policy</td><td>versioned migration-first data evolution</td></tr>
+              <tr><td>indexing_strategy</td><td>targeted indexes for ownership, chronology, and reporting access patterns</td></tr>
+              <tr><td>rls_enabled_tables</td><td>row-level security policies applied to user-scoped data domains</td></tr>
+              <tr><td>observability_sources</td><td>deployment logs + runtime logs + typed error codes</td></tr>
+              <tr><td>build_quality_gates</td><td>lint + typecheck + automated tests in delivery workflow</td></tr>
+              <tr><td>sdk_generation_pipeline</td><td>OpenAPI export feeding generated typed client SDK</td></tr>
+              <tr><td>cache_control_matrix</td><td>cache-class segmentation for metadata vs stateful operations</td></tr>
+              <tr><td>operational_constraints</td><td>designed for hobby-tier runtime constraints with stable behavior</td></tr>
+            </tbody>
+          </table>
+        </div>
       </section>
     </main>
   </body>

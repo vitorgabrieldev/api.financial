@@ -28,7 +28,7 @@ export const createOpenApiSpec = (baseUrl?: string): Record<string, unknown> => 
   return {
     openapi: '3.1.0',
     info: {
-      title: 'My Financial Organization - Core API',
+      title: 'api.financial-core',
       version: API_CURRENT_VERSION,
       description:
         'API financeira central com autenticação por API key + token Supabase.',

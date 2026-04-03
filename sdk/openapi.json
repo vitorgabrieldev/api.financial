@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "My Financial Organization - Core API",
+    "title": "api.financial-core",
     "version": "1.2.0",
     "description": "API financeira central com autenticação por API key + token Supabase."
   },
