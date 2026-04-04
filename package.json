@@ -4,7 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node --watch --env-file=.env.local --import tsx src/dev/server.ts",
+    "dev": "concurrently -k -n api,web -c cyan,magenta \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "node --watch --env-file=.env.local --import tsx src/dev/server.ts",
+    "dev:web": "node --env-file=.env.local --input-type=module -e \"import { spawn } from 'node:child_process'; const env = { ...process.env, CORE_API_BASE_URL: process.env.CORE_API_BASE_URL || 'http://localhost:3000', CORE_API_KEY: process.env.CORE_API_KEY || process.env.API_KEY }; const child = spawn('npm', ['--prefix', 'site.financial', 'run', 'dev'], { stdio: 'inherit', env }); child.on('exit', (code) => process.exit(code ?? 0));\"",
     "dev:vercel": "vercel dev --yes --listen 127.0.0.1:3001",
     "build": "npm run typecheck",
     "typecheck": "tsc --noEmit",
@@ -26,6 +28,7 @@
     "@types/node": "^24.9.2",
     "@vercel/node": "^5.4.0",
     "@vitest/coverage-v8": "^4.0.7",
+    "concurrently": "^9.2.1",
     "eslint": "^9.39.1",
     "globals": "^17.0.0",
     "openapi-typescript-codegen": "^0.29.0",

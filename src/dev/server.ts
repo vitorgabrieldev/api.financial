@@ -6,6 +6,7 @@ import express, {
 } from 'express'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { routeApiRequest } from '../routes/router.js'
+import { authenticateToken } from '../core/supabase.js'
 
 type ApiHandler = (
   req: VercelRequest,
@@ -14,11 +15,48 @@ type ApiHandler = (
 
 const app = express()
 const docsDir = path.join(process.cwd(), 'docs')
+const rootIndexFile = path.join(process.cwd(), 'index.html')
+const frontendSessionCookie = 'fc_access_token'
 
 app.disable('x-powered-by')
 app.use(express.json({ limit: '4mb' }))
 app.use(express.urlencoded({ extended: true }))
 app.use('/docs', express.static(docsDir))
+
+const readCookie = (cookieHeader: string | undefined, key: string): string => {
+  if (!cookieHeader) return ''
+
+  const segments = cookieHeader.split(';')
+  for (const segment of segments) {
+    const [rawName, ...rawValue] = segment.trim().split('=')
+    if (rawName !== key) continue
+    return decodeURIComponent(rawValue.join('=') ?? '')
+  }
+
+  return ''
+}
+
+app.get('/', async (req: Request, res: Response) => {
+  const accessToken = readCookie(req.headers.cookie, frontendSessionCookie)
+
+  if (!accessToken) {
+    res.status(401).json({
+      code: 'UNAUTHORIZED_HOME',
+      error: 'Não autorizado. Faça login no frontend para acessar esta página.',
+    })
+    return
+  }
+
+  try {
+    await authenticateToken(accessToken)
+    res.sendFile(rootIndexFile)
+  } catch {
+    res.status(401).json({
+      code: 'UNAUTHORIZED_HOME',
+      error: 'Sessão inválida ou expirada. Faça login novamente no frontend.',
+    })
+  }
+})
 
 const withHandler = (
   handler: ApiHandler,

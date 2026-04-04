@@ -160,16 +160,32 @@ Arquivos gerados em:
 Crie `.env.local` a partir de `.env.example`:
 
 - `API_KEY` (obrigatória)
+- `CORE_API_BASE_URL` (opcional para frontend local; default `http://localhost:3000`)
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY` (opcional)
 - `CORS_ALLOW_ORIGIN` (default `*`)
+
+Observação:
+- também aceitamos aliases de ambiente (`NEXT_PUBLIC_*` e `VITE_*`) para compatibilidade com env exportado da Vercel.
 
 ## Rodando localmente
 
 ```bash
 npm install
 npm run dev
+```
+
+O `npm run dev` da raiz inicia:
+
+- API local: `http://localhost:3000`
+- Frontend local (`site.financial`): `http://localhost:4000`
+- Ambos usando o mesmo `.env.local` da raiz.
+
+Se quiser subir apenas a API:
+
+```bash
+npm run dev:api
 ```
 
 ## Qualidade
